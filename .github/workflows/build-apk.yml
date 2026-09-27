@@ -1,0 +1,48 @@
+name: Build Android APK for Ambala Worker
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Set up Java JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install Bubblewrap CLI
+      run: |
+        npm install -g @bubblewrap/cli
+
+    - name: Initialize and Build Android APK
+      run: |
+        echo "Building Ambala Worker Android Package..."
+        mkdir -p android-build
+        cd android-build
+        # Initialize bubblewrap with manifest
+        npx @bubblewrap/cli init --manifest=../manifest.json
+        # Build APK
+        npx @bubblewrap/cli build
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AmbalaWorker-Android-APK
+        path: android-build/*.apk
