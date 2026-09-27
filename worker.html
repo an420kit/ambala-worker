@@ -30,6 +30,18 @@
       }
     };
   </script>
+  <!-- Computer Vision & Aadhaar OCR -->
+  <script src="js/aadhaar-ocr.js?v=3.2"></script>
+  <style>
+    @keyframes laserSweep {
+      0% { top: 0%; opacity: 0.8; }
+      50% { top: 90%; opacity: 1; }
+      100% { top: 0%; opacity: 0.8; }
+    }
+    .scan-laser-beam {
+      animation: laserSweep 1.8s ease-in-out infinite;
+    }
+  </style>
   <link rel="stylesheet" href="css/style.css?v=3.1"/>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
@@ -192,27 +204,88 @@
     <section id="tab-reg" class="worker-tab-content hidden flex flex-col gap-3">
       <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-4">
         <div>
-          <span class="text-[10px] uppercase font-bold text-emerald-600 tracking-wider">नया साथी जुड़ें</span>
-          <h2 class="text-base font-bold text-slate-900">नया कामगार रजिस्ट्रेशन फॉर्म</h2>
-          <p class="text-xs text-slate-500 mt-0.5">अपना गांव या नया काम भरें — एडमिन सत्यापन के बाद तुरंत लाइव होगा।</p>
+          <span class="text-[10px] uppercase font-bold text-amber-600 tracking-wider">नया साथी जुड़ें</span>
+          <h2 class="text-base font-bold text-slate-900">नया कामगार आधार KYC पंजीकरण</h2>
+          <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">
+            ⚡ <strong>अनिवार्य आधार सत्यापन:</strong> आधार कार्ड की फोटो अपलोड करें। AI विज़न स्वतः आपका नाम और मूल स्थायी पता दर्ज करेगा। आधिकारिक ID एडमिन स्वीकृति के बाद बनेगी।
+          </p>
         </div>
 
-        <form id="form-new-reg" class="flex flex-col gap-3" onsubmit="event.preventDefault();">
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-bold text-slate-700" for="reg-name">पूरा नाम *</label>
-            <input id="reg-name" type="text" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900" placeholder="उदा. सुरिंदर सिंह / पूजा रानी" required />
+        <form id="form-new-reg" class="flex flex-col gap-3.5" onsubmit="event.preventDefault();">
+          
+          <!-- MANDATORY AADHAAR CARD PHOTO -->
+          <div class="flex flex-col gap-1.5 p-3 rounded-2xl bg-amber-50 border-2 border-dashed border-amber-300">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-amber-900 flex items-center gap-1.5" for="reg-aadhaar-file">
+                <span>🪪 आधार कार्ड की फोटो (अनिवार्य / Mandatory) *</span>
+              </label>
+              <span class="text-[9px] text-amber-800 font-extrabold bg-amber-200/80 px-2 py-0.5 rounded-full">📷 AI विज़न स्कैन</span>
+            </div>
+            
+            <input id="reg-aadhaar-file" type="file" accept="image/*" class="w-full text-xs text-slate-700 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer" required />
+            
+            <p class="text-[10px] text-slate-500">
+              फोटो चुनते ही Computer Vision स्वतः नाम, 12-अंकों का आधार UID और स्थायी पता निकाल लेगा।
+            </p>
+
+            <!-- Computer Vision Scanning HUD -->
+            <div id="worker-aadhaar-scanning-hud" class="hidden relative rounded-xl overflow-hidden border border-amber-400 bg-slate-950 p-2 mt-1">
+              <div class="relative w-full h-36 bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center">
+                <img id="worker-aadhaar-preview-img" src="" class="w-full h-full object-contain" alt="Aadhaar Preview"/>
+                <div id="worker-aadhaar-laser" class="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent scan-laser-beam shadow-[0_0_12px_#22d3ee]"></div>
+              </div>
+              <div class="flex items-center justify-between mt-2 px-1 text-[11px]">
+                <span id="worker-ocr-status" class="text-amber-300 font-bold flex items-center gap-1.5">
+                  <span class="animate-spin inline-block">🔄</span>
+                  <span>AI विज़न आधार कार्ड को पढ़ रहा है...</span>
+                </span>
+                <span id="worker-ocr-pct" class="text-emerald-400 font-mono font-bold">50%</span>
+              </div>
+            </div>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-bold text-slate-700" for="reg-phone">मोबाइल नंबर *</label>
-            <input id="reg-phone" type="tel" maxlength="10" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900" placeholder="10 अंकों का मोबाइल नंबर" required />
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- AUTO-EXTRACTED BY OCR: Name & Aadhaar Number -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-bold text-slate-700" for="reg-locality">गांव या कस्बा चुनें *</label>
-              <input id="reg-locality" type="text" list="worker-localities-list" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900" placeholder="उदा. पंजोखरा, बब्याल, साहा..." required />
-              <datalist id="worker-localities-list"></datalist>
+              <label class="text-xs font-bold text-slate-700 flex items-center justify-between" for="reg-name">
+                <span>पूरा नाम *</span>
+                <span class="text-[9px] text-amber-700">OCR से प्राप्त</span>
+              </label>
+              <input id="reg-name" type="text" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900 font-semibold" placeholder="आधार कार्ड अनुसार नाम" required />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-slate-700 flex items-center justify-between" for="reg-aadhaar">
+                <span>आधार नंबर (12 अंक) *</span>
+                <span class="text-[9px] text-amber-700">OCR से प्राप्त</span>
+              </label>
+              <input id="reg-aadhaar" type="text" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900 font-mono font-bold" placeholder="XXXX XXXX XXXX" required />
+            </div>
+          </div>
+
+          <!-- AUTO-EXTRACTED BY OCR: Permanent Address (मूल स्थायी पता) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-slate-700 flex items-center justify-between" for="reg-permanent">
+              <span>मूल स्थायी पता (Permanent Address) *</span>
+              <span class="text-[9px] text-amber-700 font-bold">आधार कार्ड से ऑटो-पिक</span>
+            </label>
+            <textarea id="reg-permanent" rows="2" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900 leading-relaxed" placeholder="आधार कार्ड का मूल स्थायी पता (AI द्वारा स्वतः भरा जाएगा)" required></textarea>
+          </div>
+
+          <!-- MANUAL LOCAL ADDRESS IN AMBALA (स्थानीय पता) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-slate-700 flex items-center justify-between" for="reg-locality">
+              <span>अम्बाला में स्थानीय पता / गांव या कस्बा (Local Address) *</span>
+              <span class="text-[9px] text-slate-500">मैन्युअल भरें</span>
+            </label>
+            <input id="reg-locality" type="text" list="worker-localities-list" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900" placeholder="उदा. पंजोखरा, बब्याल, साहा, सदर बाजार, मॉडल टाउन..." required />
+            <datalist id="worker-localities-list"></datalist>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-slate-700" for="reg-phone">मोबाइल नंबर (10 अंक) *</label>
+              <input id="reg-phone" type="tel" maxlength="10" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900 font-mono" placeholder="10 अंकों का मोबाइल नंबर" required />
             </div>
 
             <div class="flex flex-col gap-1">
@@ -222,13 +295,24 @@
             </div>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-bold text-slate-700">आधार कार्ड या पहचान पत्र (KYC)</label>
-            <input type="file" class="text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-900 file:text-white" />
+          <!-- Rates -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-slate-700" for="reg-daily">दैनिक मजदूरी (₹/दिन)</label>
+              <input id="reg-daily" type="number" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-slate-900" placeholder="800" value="800" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-slate-700" for="reg-hourly">घंटेवार दर (₹/घंटा)</label>
+              <input id="reg-hourly" type="number" class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-slate-900" placeholder="150" value="150" />
+            </div>
           </div>
 
-          <button id="btn-submit-reg" type="button" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 mt-2">
-            <span>रजिस्ट्रेशन सबमिट करें ➔</span>
+          <div class="p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-[11px] text-slate-600 leading-relaxed">
+            🛡️ <strong>सत्यापन प्रक्रिया:</strong> आवेदन सबमिट करने पर प्रोफाइल <strong>एडमिन (an420kit)</strong> के पास पेंडिंग सत्यापन में जमा होगी। एडमिन द्वारा स्वीकृति के बाद ही आपको आधिकारिक <strong>Worker ID (AW-XXXX)</strong> मिलेगी।
+          </div>
+
+          <button id="btn-submit-reg" type="button" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 mt-1">
+            <span>📄 आधार KYC आवेदन सबमिट करें ➔</span>
           </button>
         </form>
       </div>
@@ -429,17 +513,71 @@
         }
       }
 
+      // Load active session profile
+      try {
+        const sess = JSON.parse(localStorage.getItem('ambala_auth_session') || '{}');
+        if (sess && sess.name) {
+          const profTitle = document.getElementById('worker-profile-title');
+          if (profTitle) profTitle.textContent = sess.name;
+        }
+      } catch (e) {}
+
+      // Aadhaar File OCR Listener
+      let workerAadhaarPhoto = null;
+      let workerAadhaarDoc = 'Aadhaar_Card.jpg';
+      const fileInput = document.getElementById('reg-aadhaar-file');
+      if (fileInput) {
+        fileInput.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const hud = document.getElementById('worker-aadhaar-scanning-hud');
+          const previewImg = document.getElementById('worker-aadhaar-preview-img');
+          const statusSpan = document.getElementById('worker-ocr-status');
+          const pctSpan = document.getElementById('worker-ocr-pct');
+
+          if (hud) hud.classList.remove('hidden');
+          if (previewImg) previewImg.src = URL.createObjectURL(file);
+
+          if (window.AMBALA_OCR && window.AMBALA_OCR.scanAadhaarCard) {
+            const res = await window.AMBALA_OCR.scanAadhaarCard(file, (msg, pct) => {
+              if (statusSpan) statusSpan.innerHTML = `<span class="animate-spin inline-block">🔄</span> <span>${msg}</span>`;
+              if (pctSpan) pctSpan.textContent = `${pct}%`;
+            });
+
+            workerAadhaarPhoto = res.photoDataUrl;
+            workerAadhaarDoc = res.photoName;
+
+            if (res.name) document.getElementById('reg-name').value = res.name;
+            if (res.aadhaarNumber) document.getElementById('reg-aadhaar').value = res.aadhaarNumber;
+            if (res.permanentAddress) document.getElementById('reg-permanent').value = res.permanentAddress;
+
+            if (statusSpan) statusSpan.innerHTML = `✅ <span class="text-emerald-300 font-bold">आधार स्कैन पूर्ण!</span>`;
+            if (pctSpan) pctSpan.textContent = `100%`;
+          }
+        });
+      }
+
       // Registration Submit
       const regBtn = document.getElementById('btn-submit-reg');
       if (regBtn) {
         regBtn.addEventListener('click', () => {
           const name = document.getElementById('reg-name').value.trim();
           const phone = document.getElementById('reg-phone').value.trim();
-          const locality = document.getElementById('reg-locality').value.trim();
+          const localAddress = document.getElementById('reg-locality').value.trim();
+          const permAddress = document.getElementById('reg-permanent').value.trim();
+          const aadhaarNum = document.getElementById('reg-aadhaar').value.trim();
           const trade = document.getElementById('reg-trade').value.trim();
+          const daily = document.getElementById('reg-daily').value.trim() || 800;
+          const hourly = document.getElementById('reg-hourly').value.trim() || 150;
 
-          if (!name || !phone || phone.length < 10) {
-            alert('कृपया वैध नाम और 10-अंकों का मोबाइल नंबर भरें');
+          if (!workerAadhaarPhoto && (!fileInput || !fileInput.files[0])) {
+            alert('⚠️ आधार कार्ड की फोटो डालना अनिवार्य है!');
+            return;
+          }
+
+          if (!name || !phone || phone.length < 10 || !trade || !localAddress) {
+            alert('कृपया सभी आवश्यक फ़ील्ड (नाम, 10-अंकों का मोबाइल, काम/पेशा, स्थानीय अम्बाला पता) भरें');
             return;
           }
 
@@ -447,15 +585,22 @@
             window.AMBALA_DATA.registerWorker({
               name: name,
               phone: phone,
-              locality: locality || 'अम्बाला',
-              trade: trade || 'कारीगर',
-              roleHi: trade || 'कारीगर',
-              experience: '5 साल का अनुभव'
+              locality: localAddress,
+              localAddress: localAddress,
+              permanentAddress: permAddress || 'आधार अनुसार स्थायी पता',
+              trade: trade,
+              roleHi: trade,
+              dailyRate: daily,
+              hourlyRate: hourly,
+              aadhaarNumber: aadhaarNum || 'सत्यापन हेतु संलग्न',
+              aadhaarPhoto: workerAadhaarPhoto,
+              aadhaarDocName: workerAadhaarDoc
             });
           }
 
-          showWorkerToast(`धन्यवाद ${name}! आपकी प्रोफाइल एडमिन के पास पेंडिंग अप्रूवल में भेज दी गई है।`);
+          showWorkerToast(`धन्यवाद ${name}! आपका आवेदन एडमिन (an420kit) के पास पेंडिंग सत्यापन में जमा हुआ है।`);
           document.getElementById('form-new-reg').reset();
+          workerAadhaarPhoto = null;
         });
       }
     });
