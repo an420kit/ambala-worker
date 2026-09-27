@@ -814,18 +814,233 @@ function matchWorkerSearch(worker, query) {
   return false;
 }
 
+// --- STATE MANAGEMENT HELPERS FOR WORKERS, JOBS & CUSTOMERS ---
+
+function getStoredWorkers() {
+  try {
+    const raw = localStorage.getItem('ambala_workers');
+    if (raw) return JSON.parse(raw);
+    const initialApproved = INITIAL_WORKERS.filter(w => w.status !== 'pending' && w.isVerified);
+    localStorage.setItem('ambala_workers', JSON.stringify(initialApproved));
+    return initialApproved;
+  } catch (e) {
+    return INITIAL_WORKERS.filter(w => w.status !== 'pending' && w.isVerified);
+  }
+}
+
+function getPendingWorkers() {
+  try {
+    const raw = localStorage.getItem('ambala_pending_workers');
+    if (raw) return JSON.parse(raw);
+    const initialPending = INITIAL_WORKERS.filter(w => w.status === 'pending' || !w.isVerified);
+    localStorage.setItem('ambala_pending_workers', JSON.stringify(initialPending));
+    return initialPending;
+  } catch (e) {
+    return INITIAL_WORKERS.filter(w => w.status === 'pending' || !w.isVerified);
+  }
+}
+
+function getRejectedWorkers() {
+  try {
+    const raw = localStorage.getItem('ambala_rejected_workers');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function approveWorker(workerId) {
+  const pending = getPendingWorkers();
+  const workerIndex = pending.findIndex(w => w.id === workerId);
+  if (workerIndex === -1) return null;
+
+  const [worker] = pending.splice(workerIndex, 1);
+  worker.isVerified = true;
+  worker.status = 'approved';
+  worker.approvedAt = new Date().toISOString();
+
+  // Save updated pending
+  localStorage.setItem('ambala_pending_workers', JSON.stringify(pending));
+
+  // Add to approved
+  const approved = getStoredWorkers();
+  const existingIdx = approved.findIndex(w => w.id === workerId);
+  if (existingIdx !== -1) {
+    approved[existingIdx] = worker;
+  } else {
+    approved.push(worker);
+  }
+  localStorage.setItem('ambala_workers', JSON.stringify(approved));
+  window.AMBALA_DATA.workers = approved;
+
+  return worker;
+}
+
+function rejectWorker(workerId, reason = 'दस्तावेज अपूर्ण या सत्यापन में त्रुटि') {
+  const pending = getPendingWorkers();
+  const workerIndex = pending.findIndex(w => w.id === workerId);
+  if (workerIndex === -1) return null;
+
+  const [worker] = pending.splice(workerIndex, 1);
+  worker.isVerified = false;
+  worker.status = 'rejected';
+  worker.rejectionReason = reason;
+  worker.rejectedAt = new Date().toISOString();
+
+  // Save updated pending
+  localStorage.setItem('ambala_pending_workers', JSON.stringify(pending));
+
+  // Add to rejected
+  const rejected = getRejectedWorkers();
+  rejected.unshift(worker);
+  localStorage.setItem('ambala_rejected_workers', JSON.stringify(rejected));
+
+  return worker;
+}
+
+function restoreWorker(workerId) {
+  const rejected = getRejectedWorkers();
+  const workerIndex = rejected.findIndex(w => w.id === workerId);
+  if (workerIndex === -1) return null;
+
+  const [worker] = rejected.splice(workerIndex, 1);
+  worker.status = 'pending';
+  delete worker.rejectionReason;
+
+  localStorage.setItem('ambala_rejected_workers', JSON.stringify(rejected));
+
+  const pending = getPendingWorkers();
+  pending.unshift(worker);
+  localStorage.setItem('ambala_pending_workers', JSON.stringify(pending));
+
+  return worker;
+}
+
+function registerWorker(workerData) {
+  const pending = getPendingWorkers();
+  const newWorker = {
+    id: 'w-' + Date.now().toString(36),
+    name: workerData.name,
+    category: workerData.category || 'dihadi',
+    roleHi: workerData.roleHi || workerData.trade || 'कारीगर',
+    roleEn: workerData.trade || 'Worker',
+    townOrVillage: workerData.locality || workerData.townOrVillage || 'अम्बाला',
+    locationType: 'town',
+    phone: workerData.phone,
+    whatsapp: '91' + workerData.phone,
+    experienceHi: workerData.experience || '5 साल का अनुभव',
+    rating: 5.0,
+    reviewsCount: 0,
+    isVerified: false,
+    status: 'pending',
+    hourlyRate: Number(workerData.hourlyRate) || 150,
+    dailyRate: Number(workerData.dailyRate) || 800,
+    weeklyRate: Number(workerData.weeklyRate) || 4800,
+    monthlyRate: Number(workerData.monthlyRate) || 20000,
+    bioHi: workerData.bioHi || 'अम्बाला में विश्वसनीय व अनुभवी कामगार।',
+    avatar: workerData.avatar || 'assets/app-icon.png',
+    aadhaarNumber: workerData.aadhaarNumber || 'सत्यापन हेतु जमा',
+    aadhaarDocName: workerData.aadhaarDocName || 'Aadhaar_Document.jpg',
+    registeredAt: new Date().toISOString()
+  };
+
+  pending.unshift(newWorker);
+  localStorage.setItem('ambala_pending_workers', JSON.stringify(pending));
+  return newWorker;
+}
+
+function getStoredJobs() {
+  try {
+    const raw = localStorage.getItem('ambala_jobs');
+    if (raw) return JSON.parse(raw);
+    localStorage.setItem('ambala_jobs', JSON.stringify(INITIAL_POSTED_JOBS));
+    return INITIAL_POSTED_JOBS;
+  } catch (e) {
+    return INITIAL_POSTED_JOBS;
+  }
+}
+
+function addJob(jobData) {
+  const jobs = getStoredJobs();
+  const newJob = {
+    id: 'job-' + Date.now().toString(36),
+    titleHi: jobData.titleHi || jobData.title || 'काम की आवश्यकता',
+    category: jobData.category || 'dihadi',
+    duration: jobData.duration || 'daily',
+    localityHi: jobData.locality || 'अम्बाला',
+    townOrVillage: jobData.locality || 'अम्बाला',
+    locationType: 'town',
+    budget: jobData.budget || 'तय मजदूरी',
+    budgetAmount: Number(jobData.budgetAmount) || 600,
+    customerName: jobData.customerName || 'अम्बाला ग्राहक',
+    customerPhone: jobData.phone || '9812345000',
+    timeAgoHi: 'अभी-अभी पोस्ट किया',
+    descHi: jobData.descHi || jobData.desc || 'काम के लिए तुरंत संपर्क करें।',
+    status: 'open',
+    postedAt: new Date().toISOString()
+  };
+
+  jobs.unshift(newJob);
+  localStorage.setItem('ambala_jobs', JSON.stringify(jobs));
+  window.AMBALA_DATA.postedJobs = jobs;
+  return newJob;
+}
+
+function getStoredCustomers() {
+  try {
+    const raw = localStorage.getItem('ambala_customers');
+    return raw ? JSON.parse(raw) : [
+      { id: 'c-01', name: 'अनिल बंसल', phone: '9812345000', locality: 'सेक्टर 7', password: '123' }
+    ];
+  } catch (e) {
+    return [];
+  }
+}
+
+function registerCustomer(custData) {
+  const customers = getStoredCustomers();
+  const existing = customers.find(c => c.phone === custData.phone);
+  if (existing) {
+    return { success: false, message: 'यह मोबाइल नंबर पहले से पंजीकृत है।' };
+  }
+
+  const newCust = {
+    id: 'cust-' + Date.now().toString(36),
+    name: custData.name,
+    phone: custData.phone,
+    locality: custData.locality || 'अम्बाला',
+    password: custData.password || '1234',
+    registeredAt: new Date().toISOString()
+  };
+
+  customers.push(newCust);
+  localStorage.setItem('ambala_customers', JSON.stringify(customers));
+  return { success: true, customer: newCust };
+}
+
 // Export to window
 window.AMBALA_DATA = {
   localities: getStoredLocalities(),
   categories: getStoredCategories(),
-  workers: INITIAL_WORKERS,
+  workers: getStoredWorkers(),
   standardRates: AMBALA_STANDARD_RATES,
-  postedJobs: INITIAL_POSTED_JOBS,
+  postedJobs: getStoredJobs(),
   ads: INITIAL_ADS,
   searchSynonyms: SEARCH_SYNONYMS,
   matchWorkerSearch: matchWorkerSearch,
   addMasterLocality: addMasterLocality,
   addMasterCategory: addMasterCategory,
   getStoredLocalities: getStoredLocalities,
-  getStoredCategories: getStoredCategories
+  getStoredCategories: getStoredCategories,
+  getStoredWorkers: getStoredWorkers,
+  getPendingWorkers: getPendingWorkers,
+  getRejectedWorkers: getRejectedWorkers,
+  approveWorker: approveWorker,
+  rejectWorker: rejectWorker,
+  restoreWorker: restoreWorker,
+  registerWorker: registerWorker,
+  getStoredJobs: getStoredJobs,
+  addJob: addJob,
+  getStoredCustomers: getStoredCustomers,
+  registerCustomer: registerCustomer
 };
