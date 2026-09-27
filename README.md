@@ -1,0 +1,2 @@
+# ambala worker
+local worker
