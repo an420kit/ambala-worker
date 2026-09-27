@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="hi" class="h-full">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>अम्बाला वर्कर - एकीकृत लॉगिन पोर्टल (Ambala Worker Portal)</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta name="description" content="अम्बाला कैंट, सिटी, कस्बों व गांवों का एकीकृत लॉगिन पोर्टल। ID, पासवर्ड या मोबाइल OTP अनुसार एडमिन, कामगार या ग्राहक ऐप खोलें।"/>
+  
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0f172a"/>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg"/>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..500,0..1,0" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/style.css?v=3.1"/>
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased min-h-screen flex flex-col items-center justify-center p-4 pb-20">
+
+  <!-- ==========================================================================
+       LOGIN PORTAL CONTAINER
+       ========================================================================== -->
+  <div class="w-full max-w-md flex flex-col items-center">
+
+    <!-- Brand Logo & Header -->
+    <div class="text-center flex flex-col items-center mb-5">
+      <div class="relative mb-3">
+        <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-emerald-300 text-slate-950 flex items-center justify-center font-black text-3xl shadow-2xl shadow-emerald-500/25 ring-4 ring-emerald-500/20">
+          AW
+        </div>
+        <span class="absolute -bottom-1 -right-1 w-7 h-7 bg-amber-400 text-slate-950 rounded-full border-2 border-slate-900 flex items-center justify-center text-sm shadow-md" title="सिंगल साइन-ऑन">🔑</span>
+      </div>
+
+      <div class="flex items-center justify-center gap-2">
+        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">अम्बाला वर्कर पोर्टल</h1>
+        <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/30">एकीकृत लॉगिन</span>
+      </div>
+      <p class="text-xs text-slate-300 mt-1.5 max-w-xs mx-auto leading-relaxed">
+        लॉगिन पोर्टल एक ही है — आपके <strong>ID, पासवर्ड या OTP</strong> पर निर्भर करेगा कि <strong>एडमिन, कामगार या ग्राहक</strong> ऐप खुलेगा।
+      </p>
+    </div>
+
+    <!-- Login Mode Tabs (Password vs Mobile OTP) -->
+    <div class="w-full bg-slate-900 p-1 rounded-2xl border border-slate-800 mb-3 flex gap-1 text-xs font-bold shadow-md">
+      <button id="tab-btn-pass" type="button" class="flex-1 py-2 rounded-xl bg-emerald-600 text-white transition-all text-center flex items-center justify-center gap-1.5 shadow-xs">
+        <span class="material-symbols-outlined text-[16px]">lock</span>
+        <span>आईडी व पासवर्ड</span>
+      </button>
+      <button id="tab-btn-otp" type="button" class="flex-1 py-2 rounded-xl text-slate-400 hover:text-white transition-all text-center flex items-center justify-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px]">sms</span>
+        <span>📲 मोबाइल OTP लॉगिन</span>
+      </button>
+    </div>
+
+    <!-- Login Card -->
+    <div class="w-full bg-slate-900/90 rounded-3xl p-5 sm:p-6 border border-slate-800 shadow-2xl backdrop-blur-md">
+      
+      <!-- MODE 1: PASSWORD LOGIN FORM -->
+      <div id="section-pass-login">
+        <div class="flex items-center justify-between pb-3.5 border-b border-slate-800/80 mb-4">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">सुरक्षित लॉगिन (Sign In)</span>
+            <h2 class="text-sm font-bold text-white">खाता ID व पासवर्ड दर्ज करें</h2>
+          </div>
+          <span class="text-xl">🔐</span>
+        </div>
+
+        <form id="login-form" class="flex flex-col gap-3.5" onsubmit="event.preventDefault(); handleLoginSubmit();">
+          <!-- User ID / Phone -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300 flex items-center justify-between" for="input-login-id">
+              <span>यूजर ID / मोबाइल नंबर</span>
+              <span class="text-[10px] text-slate-400 font-normal">admin / worker / customer</span>
+            </label>
+            <div class="relative flex items-center bg-slate-950/90 border border-slate-700/80 rounded-2xl px-3.5 py-3 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+              <span class="material-symbols-outlined text-slate-400 text-[18px] mr-2">person</span>
+              <input id="input-login-id" type="text" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-medium" placeholder="उदा. admin, worker या customer" autocomplete="username" required />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300 flex items-center justify-between" for="input-login-pass">
+              <span>पासवर्ड (Password)</span>
+              <span class="text-[10px] text-slate-400 font-normal">सुरक्षित पासवर्ड</span>
+            </label>
+            <div class="relative flex items-center bg-slate-950/90 border border-slate-700/80 rounded-2xl px-3.5 py-3 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+              <span class="material-symbols-outlined text-slate-400 text-[18px] mr-2">lock</span>
+              <input id="input-login-pass" type="password" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-medium" placeholder="पासवर्ड दर्ज करें" autocomplete="current-password" required />
+              <button id="btn-toggle-pass" type="button" class="text-slate-400 hover:text-white px-1 text-xs transition-colors" title="पासवर्ड देखें/छिपाएं">
+                <span class="material-symbols-outlined text-[18px]" id="icon-pass-toggle">visibility</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Smart Dynamic Target App Preview -->
+          <div id="role-preview-box" class="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-[11px] flex items-center gap-2 text-slate-400 transition-all">
+            <span id="role-preview-icon" class="text-sm">⚡</span>
+            <span id="role-preview-text" class="flex-1 font-medium">आईडी दर्ज करें, सिस्टम स्वतः संबंधित ऐप तय करेगा</span>
+          </div>
+
+          <!-- Error Message -->
+          <div id="login-error-box" class="hidden p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
+            <span class="material-symbols-outlined text-rose-400 text-[18px]">error</span>
+            <span id="login-error-text" class="flex-1 font-semibold">अमान्य आईडी या पासवर्ड! कृपया दोबारा जांचें।</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button id="btn-submit-login" type="submit" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all text-xs flex items-center justify-center gap-2 mt-1">
+            <span>लॉगिन करें (Sign In & Open App)</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- MODE 2: MOBILE OTP LOGIN FORM (NO PASSWORD NEEDED) -->
+      <div id="section-otp-login" class="hidden">
+        <div class="flex items-center justify-between pb-3.5 border-b border-slate-800/80 mb-4">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">आसान लॉगिन (OTP Sign-In)</span>
+            <h2 class="text-sm font-bold text-white">मोबाइल नंबर से सीधा प्रवेश</h2>
+          </div>
+          <span class="text-xl">📲</span>
+        </div>
+
+        <form id="otp-login-form" class="flex flex-col gap-3.5" onsubmit="event.preventDefault(); sendOtp();">
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300" for="input-otp-phone">10-अंकों का मोबाइल नंबर दर्ज करें</label>
+            <div class="relative flex items-center bg-slate-950/90 border border-slate-700/80 rounded-2xl px-3.5 py-3 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20 transition-all">
+              <span class="text-xs font-bold text-amber-400 mr-2">+91</span>
+              <input id="input-otp-phone" type="tel" maxlength="10" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-bold" placeholder="9812345001" required />
+            </div>
+            <p class="text-[10px] text-slate-400 mt-0.5">कामगार, ग्राहक या एडमिन नंबर डालें — पासवर्ड की आवश्यकता नहीं।</p>
+          </div>
+
+          <!-- Step 2: 4-Digit OTP Boxes (Visible after sending) -->
+          <div id="box-otp-inputs" class="hidden flex flex-col gap-2 p-3 bg-slate-950/80 rounded-2xl border border-amber-500/30">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-amber-300">4-अंकों का OTP कोड भरें:</span>
+              <span class="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">डेमो कोड: 1234</span>
+            </div>
+            <div class="flex justify-center gap-2.5 my-1">
+              <input type="text" maxlength="1" class="otp-digit w-11 h-12 text-center text-lg font-black bg-slate-900 border border-slate-700 rounded-xl text-white focus:border-amber-400 focus:outline-none" value="1" />
+              <input type="text" maxlength="1" class="otp-digit w-11 h-12 text-center text-lg font-black bg-slate-900 border border-slate-700 rounded-xl text-white focus:border-amber-400 focus:outline-none" value="2" />
+              <input type="text" maxlength="1" class="otp-digit w-11 h-12 text-center text-lg font-black bg-slate-900 border border-slate-700 rounded-xl text-white focus:border-amber-400 focus:outline-none" value="3" />
+              <input type="text" maxlength="1" class="otp-digit w-11 h-12 text-center text-lg font-black bg-slate-900 border border-slate-700 rounded-xl text-white focus:border-amber-400 focus:outline-none" value="4" />
+            </div>
+            <button id="btn-verify-otp" type="button" onclick="verifyOtpAndOpen()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-md active:scale-95">
+              OTP सत्यापित करें व ऐप खोलें ➔
+            </button>
+          </div>
+
+          <!-- Send OTP Button -->
+          <button id="btn-send-otp" type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-2xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all text-xs flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">send</span>
+            <span>OTP प्राप्त करें (Send OTP)</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Direct Guest Customer Entry -->
+      <button id="btn-guest-customer" type="button" class="w-full mt-3 py-2.5 bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all border border-slate-700/60 flex items-center justify-center gap-1.5 active:scale-95">
+        <span>🛒</span>
+        <span>अतिथि के रूप में सीधे ग्राहक ऐप खोलें ➔</span>
+      </button>
+
+    </div>
+
+    <!-- Quick 1-Tap Demo Credentials Tester -->
+    <div class="w-full mt-5">
+      <div class="flex items-center justify-between mb-2.5 px-1">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">तुरंत टेस्टिंग हेतु 1-क्लिक क्रेडेंशियल्स:</span>
+        <span class="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">1-क्लिक टेस्ट</span>
+      </div>
+      
+      <div class="flex flex-col gap-2.5">
+        <!-- Demo 1: Admin -->
+        <button type="button" onclick="launchDemo('admin', 'admin123', 'admin.html')" class="p-3 bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-purple-500/50 rounded-2xl flex items-center justify-between text-left transition-all active:scale-[0.98] group">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-base font-bold">🛡️</div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h4 class="text-xs font-bold text-white group-hover:text-purple-300 transition-colors">1. एडमिन पोर्टल (Admin Portal)</h4>
+                <span class="text-[9px] px-1.5 py-0.2 bg-purple-900/60 text-purple-300 rounded font-semibold">कंट्रोल</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-mono mt-0.5">ID: <span class="text-amber-300 font-bold">admin</span> | Pass: <span class="text-amber-300 font-bold">admin123</span></p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-lg border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-all">खोलें ➔</span>
+        </button>
+
+        <!-- Demo 2: Worker / Labour -->
+        <button type="button" onclick="launchDemo('worker', 'worker123', 'worker.html')" class="p-3 bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl flex items-center justify-between text-left transition-all active:scale-[0.98] group">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-base font-bold">👷</div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h4 class="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">2. कामगार ऐप (Worker / Labour)</h4>
+                <span class="text-[9px] px-1.5 py-0.2 bg-amber-900/60 text-amber-300 rounded font-semibold">कारीगर</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-mono mt-0.5">ID: <span class="text-amber-300 font-bold">worker</span> (या 9812345001) | Pass: <span class="text-amber-300 font-bold">worker123</span></p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all">खोलें ➔</span>
+        </button>
+
+        <!-- Demo 3: Customer -->
+        <button type="button" onclick="launchDemo('customer', 'customer123', 'customer.html')" class="p-3 bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-blue-500/50 rounded-2xl flex items-center justify-between text-left transition-all active:scale-[0.98] group">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-base font-bold">🛒</div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h4 class="text-xs font-bold text-white group-hover:text-blue-300 transition-colors">3. ग्राहक ऐप (Customer App)</h4>
+                <span class="text-[9px] px-1.5 py-0.2 bg-blue-900/60 text-blue-300 rounded font-semibold">ग्राहक</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-mono mt-0.5">ID: <span class="text-amber-300 font-bold">customer</span> (या 9876543210) | Pass: <span class="text-amber-300 font-bold">customer123</span></p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white transition-all">खोलें ➔</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PWA Install App Button -->
+    <div class="w-full mt-4 p-3 bg-slate-900/90 rounded-2xl border border-slate-800 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2.5">
+        <span class="text-lg">📲</span>
+        <div>
+          <span class="font-bold text-white block">अम्बाला वर्कर ऐप इन्स्टॉल करें</span>
+          <span class="text-[10px] text-slate-400">Android APK की तरह होम स्क्रीन पर जोड़ें</span>
+        </div>
+      </div>
+      <button id="btn-install-pwa" type="button" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-all active:scale-95 shadow-sm">
+        + इन्स्टॉल
+      </button>
+    </div>
+
+    <!-- Register Link -->
+    <div class="text-center pt-4 pb-2">
+      <span class="text-slate-400 text-xs">क्या आप नए कामगार हैं?</span>
+      <a href="worker.html" class="text-emerald-400 hover:text-emerald-300 font-bold text-xs ml-1 underline decoration-dotted">
+        नया रजिस्ट्रेशन फॉर्म भरें ➔
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Simulated SMS Toast -->
+  <div id="sms-toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] bg-amber-400 text-slate-950 px-4 py-2.5 rounded-2xl font-bold text-xs shadow-2xl transition-all duration-300 opacity-0 pointer-events-none -translate-y-3 flex items-center gap-2 border-2 border-slate-900">
+    <span class="text-base">💬</span>
+    <span id="sms-toast-text">Ambala Worker OTP: 1234 (अपने फोन पर प्राप्त हुआ)</span>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // --- CACHE BUSTER SCRIPT ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      });
+    }
+
+    // Tab Toggle: Password vs OTP
+    const tabPass = document.getElementById('tab-btn-pass');
+    const tabOtp = document.getElementById('tab-btn-otp');
+    const secPass = document.getElementById('section-pass-login');
+    const secOtp = document.getElementById('section-otp-login');
+
+    tabPass.addEventListener('click', () => {
+      tabPass.className = 'flex-1 py-2 rounded-xl bg-emerald-600 text-white transition-all text-center flex items-center justify-center gap-1.5 shadow-xs';
+      tabOtp.className = 'flex-1 py-2 rounded-xl text-slate-400 hover:text-white transition-all text-center flex items-center justify-center gap-1.5';
+      secPass.classList.remove('hidden');
+      secOtp.classList.add('hidden');
+    });
+
+    tabOtp.addEventListener('click', () => {
+      tabOtp.className = 'flex-1 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold transition-all text-center flex items-center justify-center gap-1.5 shadow-xs';
+      tabPass.className = 'flex-1 py-2 rounded-xl text-slate-400 hover:text-white transition-all text-center flex items-center justify-center gap-1.5';
+      secOtp.classList.remove('hidden');
+      secPass.classList.add('hidden');
+    });
+
+    // Toggle Password Visibility
+    const passInput = document.getElementById('input-login-pass');
+    const togglePassBtn = document.getElementById('btn-toggle-pass');
+    const iconPassToggle = document.getElementById('icon-pass-toggle');
+    if (togglePassBtn) {
+      togglePassBtn.addEventListener('click', () => {
+        if (passInput.type === 'password') {
+          passInput.type = 'text';
+          iconPassToggle.textContent = 'visibility_off';
+        } else {
+          passInput.type = 'password';
+          iconPassToggle.textContent = 'visibility';
+        }
+      });
+    }
+
+    // Live Role Typing Detector
+    const idInput = document.getElementById('input-login-id');
+    const previewBox = document.getElementById('role-preview-box');
+    const previewIcon = document.getElementById('role-preview-icon');
+    const previewText = document.getElementById('role-preview-text');
+
+    idInput.addEventListener('input', () => {
+      const val = idInput.value.trim().toLowerCase();
+      if (!val) {
+        previewIcon.textContent = '⚡';
+        previewText.textContent = 'आईडी दर्ज करें, सिस्टम स्वतः संबंधित ऐप तय करेगा';
+        previewBox.className = 'p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-[11px] flex items-center gap-2 text-slate-400 transition-all';
+      } else if (val.includes('admin') || val === 'ambala_admin') {
+        previewIcon.textContent = '🛡️';
+        previewText.innerHTML = '<strong class="text-purple-300">एडमिन पोर्टल (Admin Portal)</strong> खुलेगा';
+        previewBox.className = 'p-2.5 rounded-xl bg-purple-950/40 border border-purple-500/40 text-[11px] flex items-center gap-2 text-purple-200 transition-all';
+      } else if (val.includes('worker') || val.includes('labour') || val === '9812345001' || val === 'rajesh') {
+        previewIcon.textContent = '👷';
+        previewText.innerHTML = '<strong class="text-amber-300">कामगार / लेबर ऐप (Worker Portal)</strong> खुलेगी';
+        previewBox.className = 'p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-[11px] flex items-center gap-2 text-amber-200 transition-all';
+      } else {
+        previewIcon.textContent = '🛒';
+        previewText.innerHTML = '<strong class="text-blue-300">ग्राहक ऐप (Customer App)</strong> खुलेगी';
+        previewBox.className = 'p-2.5 rounded-xl bg-blue-950/40 border border-blue-500/40 text-[11px] flex items-center gap-2 text-blue-200 transition-all';
+      }
+    });
+
+    // 1-Tap Demo Launch
+    function launchDemo(user, pass, targetPage) {
+      document.getElementById('input-login-id').value = user;
+      document.getElementById('input-login-pass').value = pass;
+      idInput.dispatchEvent(new Event('input'));
+      
+      localStorage.setItem('ambala_auth_session', JSON.stringify({
+        role: user,
+        id: user,
+        name: user === 'admin' ? 'Master Admin' : (user === 'worker' ? 'राजेश कुमार' : 'रोहित वर्मा'),
+        loginTime: new Date().toISOString()
+      }));
+
+      setTimeout(() => {
+        window.location.href = targetPage;
+      }, 200);
+    }
+
+    // Direct Guest Entry
+    document.getElementById('btn-guest-customer').addEventListener('click', () => {
+      localStorage.setItem('ambala_auth_session', JSON.stringify({
+        role: 'customer',
+        id: 'guest',
+        name: 'अतिथि ग्राहक',
+        loginTime: new Date().toISOString()
+      }));
+      window.location.href = 'customer.html';
+    });
+
+    // Form Submit Handler
+    function handleLoginSubmit() {
+      const id = idInput.value.trim().toLowerCase();
+      const pass = passInput.value.trim();
+      const errBox = document.getElementById('login-error-box');
+
+      errBox.classList.add('hidden');
+
+      if ((id === 'admin' || id === 'ambala_admin') && (pass === 'admin123' || pass === 'admin')) {
+        localStorage.setItem('ambala_auth_session', JSON.stringify({ role: 'admin', id: 'admin', name: 'Master Admin' }));
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      if ((id === 'worker' || id === '9812345001' || id === 'rajesh') && (pass === 'worker123' || pass === 'worker' || pass === '123456')) {
+        localStorage.setItem('ambala_auth_session', JSON.stringify({ role: 'worker', id: 'w-06', name: 'राजेश कुमार' }));
+        window.location.href = 'worker.html';
+        return;
+      }
+
+      if ((id === 'customer' || id === '9876543210' || id === 'rohit') && (pass === 'customer123' || pass === 'customer' || pass === '123456')) {
+        localStorage.setItem('ambala_auth_session', JSON.stringify({ role: 'customer', id: 'c-01', name: 'रोहित वर्मा' }));
+        window.location.href = 'customer.html';
+        return;
+      }
+
+      if (pass.length >= 4) {
+        localStorage.setItem('ambala_auth_session', JSON.stringify({ role: 'customer', id: id, name: id }));
+        window.location.href = 'customer.html';
+        return;
+      }
+
+      errBox.classList.remove('hidden');
+    }
+
+    // OTP Simulation Flow
+    function sendOtp() {
+      const phone = document.getElementById('input-otp-phone').value.trim();
+      if (phone.length < 10) {
+        alert('कृपया 10-अंकों का वैध मोबाइल नंबर दर्ज करें');
+        return;
+      }
+
+      const toast = document.getElementById('sms-toast');
+      const toastText = document.getElementById('sms-toast-text');
+      toastText.textContent = `📲 Ambala Worker OTP: 1234 (+91 ${phone} पर भेजा गया)`;
+      toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      document.getElementById('box-otp-inputs').classList.remove('hidden');
+      document.getElementById('btn-send-otp').classList.add('hidden');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-3');
+      }, 4000);
+    }
+
+    function verifyOtpAndOpen() {
+      const phone = document.getElementById('input-otp-phone').value.trim();
+      if (phone === '9812345001' || phone === '9812345099' || phone.startsWith('9812')) {
+        localStorage.setItem('ambala_auth_session', JSON.stringify({ role: 'worker', id: 'w-06', name: 'राजेश कुमार', phone: phone }));
+        window.location.href = 'worker.html';
+      } else if (phone === '9999999999' || phone === '9800000000') {
+        localStorage.setItem('ambala_auth_session', JSON.stringify({ role: 'admin', id: 'admin', name: 'Master Admin' }));
+        window.location.href = 'admin.html';
+      } else {
+        localStorage.setItem('ambala_auth_session', JSON.stringify({ role: 'customer', id: phone, name: 'अम्बाला ग्राहक', phone: phone }));
+        window.location.href = 'customer.html';
+      }
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    document.getElementById('btn-install-pwa').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          deferredPrompt = null;
+        }
+      } else {
+        alert('ऐप को अपने फोन में इन्स्टॉल करने के लिए ब्राउज़र के 3-डॉट मेनू पर क्लिक करें और "Add to Home Screen / Install app" चुनें।');
+      }
+    });
+  </script>
+</body>
+</html>
