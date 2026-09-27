@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="hi" class="h-full">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>अम्बाला वर्कर - ग्राहक ऐप (Customer App)</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0f172a"/>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg"/>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..500,0..1,0" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/style.css?v=3.1"/>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col pb-20">
+
+  <!-- ==========================================================================
+       CUSTOMER HEADER (Standalone - With Locality Selector, Post Job & Logout)
+       ========================================================================== -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-2.5 shadow-xs">
+    <div class="max-w-2xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
+          AW
+        </div>
+        <div>
+          <span class="text-xs font-black tracking-tight block leading-tight">अम्बाला वर्कर</span>
+          <span class="text-[9px] text-emerald-600 font-bold block leading-none">ग्राहक ऐप (Customer)</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2">
+        <!-- Locality Selector -->
+        <button id="btn-cust-locality" class="px-2.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-800 flex items-center gap-1 transition-colors border border-slate-200">
+          <span>📍</span>
+          <span id="cust-locality-label" class="max-w-[100px] truncate">सभी इलाके</span>
+          <span class="material-symbols-outlined text-[15px] text-slate-500">expand_more</span>
+        </button>
+
+        <!-- Post Job Button -->
+        <button id="btn-cust-post-job" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-full shadow-sm active:scale-95 transition-all flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px]">add</span>
+          <span>काम पोस्ट</span>
+        </button>
+
+        <!-- Logout -->
+        <button id="btn-cust-logout" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-full border border-rose-200 transition-all flex items-center gap-1" title="लॉगआउट">
+          <span class="material-symbols-outlined text-[15px]">logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="flex-1 max-w-2xl w-full mx-auto p-4 flex flex-col gap-4">
+
+    <!-- Active Sponsored Ad Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-3 text-white flex items-center justify-between shadow-md border border-slate-800">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black">ऑफर</span>
+          <h3 class="text-xs font-bold text-white">दीपावली व शादी सीजन: मकान पुट्टी-पेंट मेला</h3>
+        </div>
+        <p class="text-[11px] text-slate-300 mt-0.5">Asian Paints अधिकृत पेंटर उपलब्ध • 15% छूट व फ्री कोटेशन</p>
+      </div>
+      <a href="tel:9812345000" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black shadow-sm shrink-0 flex items-center gap-1">
+        <span>📞 कॉल</span>
+      </a>
+    </div>
+
+    <!-- Hero Banner with Verified Workers -->
+    <div class="relative rounded-3xl overflow-hidden shadow-lg border border-slate-200/80">
+      <img src="assets/hero_banner.jpg" class="w-full h-44 object-cover object-center" alt="Ambala Workers"/>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent flex flex-col justify-end p-4 text-white">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px]">अम्बाला का अपना पोर्टल</span>
+          <span class="text-[10px] text-emerald-300 font-bold">• 60+ गांव व कस्बे</span>
+        </div>
+        <h2 class="text-base sm:text-lg font-black leading-tight">भरोसेमंद मिस्त्री, बाई व लेबर — सीधे कॉल करें</h2>
+        <p class="text-xs text-slate-300 mt-0.5">✓ 0% कमीशन • आधार सत्यापित • घंटेवार / दिहाड़ी / मासिक दरें</p>
+      </div>
+    </div>
+
+    <!-- Search Input with 🎙️ HINDI VOICE SEARCH -->
+    <div class="relative flex items-center w-full bg-white border border-slate-200/90 rounded-2xl px-3.5 py-2.5 shadow-sm focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/10 transition-all">
+      <span class="material-symbols-outlined text-slate-400 text-[18px] mr-2">search</span>
+      <input id="input-cust-search" class="w-full bg-transparent text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none" placeholder="काम, नाम, गांव खोजें (या माइक दबाकर बोलें)..." />
+      
+      <!-- Voice Search Mic Button -->
+      <button id="btn-cust-voice" type="button" class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-all ml-1.5 shrink-0 shadow-xs active:scale-95" title="माइक दबाकर बोलें (Hindi Voice Search)">
+        <span class="material-symbols-outlined text-[18px]" id="icon-cust-mic">mic</span>
+      </button>
+    </div>
+
+    <!-- Rate Duration & 📍 GPS 'मेरे पास' Filter Tabs -->
+    <div class="bg-white p-1 rounded-2xl border border-slate-200/80 shadow-xs flex gap-1 text-xs font-semibold overflow-x-auto no-scrollbar">
+      <button class="rate-filter-btn flex-1 py-1.5 px-2 text-center rounded-xl bg-slate-900 text-white shadow-xs transition-all whitespace-nowrap" data-rate="all">सभी</button>
+      <button id="btn-nearby-filter" class="flex-1 py-1.5 px-2 text-center rounded-xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-all whitespace-nowrap font-bold flex items-center justify-center gap-1">
+        <span>📍</span>
+        <span>मेरे सबसे पास (GPS)</span>
+      </button>
+      <button class="rate-filter-btn flex-1 py-1.5 px-2 text-center rounded-xl text-slate-600 hover:text-slate-900 transition-all whitespace-nowrap" data-rate="hourly">घंटेवार</button>
+      <button class="rate-filter-btn flex-1 py-1.5 px-2 text-center rounded-xl text-slate-600 hover:text-slate-900 transition-all whitespace-nowrap" data-rate="daily">दिहाड़ी</button>
+      <button class="rate-filter-btn flex-1 py-1.5 px-2 text-center rounded-xl text-slate-600 hover:text-slate-900 transition-all whitespace-nowrap" data-rate="weekly">हफ्तेवार</button>
+      <button class="rate-filter-btn flex-1 py-1.5 px-2 text-center rounded-xl text-slate-600 hover:text-slate-900 transition-all whitespace-nowrap" data-rate="monthly">महीनेवार</button>
+    </div>
+
+    <!-- Work Categories Scroll -->
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="cust-categories-scroll">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Workers Directory Header -->
+    <div class="flex items-center justify-between pt-1">
+      <div class="flex items-center gap-1.5">
+        <h3 class="text-xs font-bold text-slate-800">कामगार सूची (Verified Workers)</h3>
+        <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-bold border border-amber-200">⭐ VIP टॉप</span>
+      </div>
+      <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200" id="cust-workers-count">14 कामगार उपलब्ध</span>
+    </div>
+
+    <!-- Worker Cards Grid -->
+    <div class="flex flex-col gap-3" id="cust-workers-list">
+      <!-- Populated by JS -->
+    </div>
+
+  </main>
+
+  <!-- ==========================================================================
+       BOTTOM NAVIGATION DOCK
+       ========================================================================== -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-lg">
+    <div class="flex justify-around items-center h-14 max-w-2xl mx-auto px-2">
+      <button class="flex flex-col items-center justify-center gap-0.5 text-emerald-600 font-bold py-1 flex-1" id="nav-tab-home">
+        <span class="material-symbols-outlined text-[20px]">home</span>
+        <span class="text-[10px]">होम</span>
+      </button>
+
+      <button class="flex flex-col items-center justify-center gap-0.5 text-slate-400 hover:text-slate-900 font-medium py-1 flex-1" id="nav-tab-workers">
+        <span class="material-symbols-outlined text-[20px]">group</span>
+        <span class="text-[10px]">कामगार</span>
+      </button>
+
+      <button class="flex flex-col items-center justify-center gap-0.5 text-slate-400 hover:text-slate-900 font-medium py-1 flex-1" id="nav-tab-rates" onclick="alert('मानक सरकारी दरें: दिहाड़ी मजदूर ₹550-650/दिन, राज मिस्त्री ₹800-950/दिन, प्लंबर ₹650-800/दिन, बाई ₹350-500/दिन।')">
+        <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+        <span class="text-[10px]">रेट कार्ड</span>
+      </button>
+
+      <button class="flex flex-col items-center justify-center gap-0.5 text-emerald-600 font-bold py-1 flex-1" id="nav-tab-post">
+        <span class="material-symbols-outlined text-[20px]">add_circle</span>
+        <span class="text-[10px]">काम पोस्ट</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Post Job Modal with 💬 WHATSAPP SHARING -->
+  <div id="modal-post-job" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-sm p-5 flex flex-col gap-3 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <h3 class="text-sm font-bold text-slate-900">नया काम पोस्ट करें</h3>
+        <button id="btn-close-post-job" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
+      </div>
+      <form id="form-post-job" class="flex flex-col gap-2.5" onsubmit="event.preventDefault();">
+        <input id="post-job-title" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900" placeholder="काम का शीर्षक (उदा. 2 दिहाड़ी मजदूर चाहिए)" required />
+        <textarea id="post-job-desc" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900" rows="3" placeholder="काम का पूरा विवरण..." required></textarea>
+        <div class="grid grid-cols-2 gap-2">
+          <input id="post-job-locality" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900" placeholder="इलाका (उदा. सेक्टर 7)" required />
+          <input id="post-job-budget" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900" placeholder="बजट (उदा. ₹650/दिन)" required />
+        </div>
+        <input id="post-job-phone" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900" placeholder="आपका मोबाइल नंबर" required />
+        
+        <button id="btn-submit-post-job" type="button" class="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-all shadow-md active:scale-95">
+          तुरंत काम पोस्ट करें ➔
+        </button>
+
+        <!-- WhatsApp Group Share Button -->
+        <button id="btn-share-whatsapp-job" type="button" class="py-2 bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-emerald-100 transition-colors">
+          <span>💬</span>
+          <span>अम्बाला व्हाट्सएप ग्रुप में शेयर करें</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="cust-toast" class="fixed bottom-16 right-5 z-[9999] bg-slate-900 text-white px-4 py-2.5 rounded-2xl font-bold text-xs shadow-2xl transition-all duration-300 opacity-0 pointer-events-none translate-y-3 flex items-center gap-2 border border-slate-700">
+    <span class="material-symbols-outlined text-emerald-400 text-[18px]">check_circle</span>
+    <span id="cust-toast-text">अपडेट सुरक्षित हो गया!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js?v=3.1"></script>
+  <script>
+    // --- CACHE BUSTER SCRIPT ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      });
+    }
+
+    // --- TOAST HELPER ---
+    function showCustToast(msg) {
+      const toast = document.getElementById('cust-toast');
+      const text = document.getElementById('cust-toast-text');
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+      }, 3000);
+    }
+
+    // --- LOGOUT BUTTON ---
+    document.getElementById('btn-cust-logout').addEventListener('click', () => {
+      localStorage.removeItem('ambala_auth_session');
+      window.location.href = 'index.html';
+    });
+
+    let currentFilter = { query: '', rate: 'all', category: 'all', sortByDistance: false };
+
+    // Distance simulation generator based on worker id
+    function getDistanceText(id) {
+      const distances = {
+        'w-01': '1.1 किमी',
+        'w-02': '1.8 किमी',
+        'w-03': '2.3 किमी',
+        'w-04': '0.9 किमी',
+        'w-05': '3.2 किमी',
+        'w-06': '1.4 किमी',
+        'w-07': '2.6 किमी'
+      };
+      return distances[id] || '2.0 किमी';
+    }
+
+    // --- RENDER WORKERS ---
+    function renderWorkers() {
+      const list = document.getElementById('cust-workers-list');
+      if (!list) return;
+      let workers = window.AMBALA_DATA ? [...(window.AMBALA_DATA.workers || [])] : [];
+
+      // Flag top 2 workers as VIP
+      workers.forEach((w, idx) => {
+        if (idx === 0 || idx === 3) w.isVip = true;
+      });
+
+      const filtered = workers.filter(w => {
+        if (currentFilter.query) {
+          const q = currentFilter.query.toLowerCase();
+          const match = (w.name && w.name.toLowerCase().includes(q)) ||
+                        (w.roleHi && w.roleHi.toLowerCase().includes(q)) ||
+                        (w.townOrVillage && w.townOrVillage.toLowerCase().includes(q)) ||
+                        (w.phone && w.phone.includes(q));
+          if (!match) return false;
+        }
+        if (currentFilter.category !== 'all' && w.category !== currentFilter.category) {
+          return false;
+        }
+        return true;
+      });
+
+      // Sort by distance if toggled
+      if (currentFilter.sortByDistance) {
+        filtered.sort((a, b) => parseFloat(getDistanceText(a.id)) - parseFloat(getDistanceText(b.id)));
+      } else {
+        // VIP first
+        filtered.sort((a, b) => (b.isVip ? 1 : 0) - (a.isVip ? 1 : 0));
+      }
+
+      document.getElementById('cust-workers-count').textContent = `${filtered.length} कामगार उपलब्ध`;
+
+      list.innerHTML = filtered.map(w => `
+        <div class="bg-white p-4 rounded-3xl ${w.isVip ? 'border-2 border-amber-400 shadow-md ring-2 ring-amber-400/20' : 'border border-slate-200/80 shadow-xs'} flex items-center justify-between gap-3 transition-all">
+          <div class="flex items-center gap-3">
+            <div class="relative shrink-0">
+              <img src="${w.avatar || 'assets/worker_rajesh.jpg'}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs" alt="${w.name}"/>
+              <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white"></span>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h4 class="text-sm font-bold text-slate-900">${w.name}</h4>
+                <span class="text-emerald-600 text-xs font-bold" title="आधार सत्यापित">✓</span>
+                ${w.isVip ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 font-black">⭐ VIP</span>' : ''}
+              </div>
+              <p class="text-xs text-slate-500">${w.roleHi || w.category}</p>
+              <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+                <span>📍 ${w.townOrVillage || 'अम्बाला'}</span>
+                <span class="text-emerald-600 font-semibold">• ⚡ ${getDistanceText(w.id)} दूर</span>
+                <span>•</span>
+                <span class="text-amber-500 font-bold">★ ${w.rating || '4.9'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-end gap-1.5">
+            <span class="text-xs font-black text-slate-900">₹${w.dailyRate || (w.rates ? w.rates.daily : '800')}<span class="text-[10px] text-slate-400 font-normal">/दिन</span></span>
+            <div class="flex items-center gap-1">
+              <a href="https://wa.me/91${w.phone}" target="_blank" class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center text-xs hover:bg-emerald-100 transition-colors" title="व्हाट्सएप">
+                💬
+              </a>
+              <a href="tel:${w.phone}" class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs hover:bg-slate-800 transition-colors" title="सीधे कॉल करें">
+                📞
+              </a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- RENDER CATEGORIES ---
+    function renderCategories() {
+      const scroll = document.getElementById('cust-categories-scroll');
+      if (!scroll) return;
+      const cats = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredCategories() : [];
+
+      let html = `<button class="cat-pill px-3 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white whitespace-nowrap shadow-xs" data-cat="all">सब काम (All)</button>`;
+      cats.forEach(c => {
+        if (c.id === 'all') return;
+        html += `<button class="cat-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white text-slate-700 hover:text-slate-900 border border-slate-200 whitespace-nowrap shadow-xs transition-colors" data-cat="${c.id || c.nameHi}">${c.icon || '🛠️'} ${c.nameHi || c.nameEn}</button>`;
+      });
+      scroll.innerHTML = html;
+
+      scroll.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          scroll.querySelectorAll('.cat-pill').forEach(b => {
+            b.className = 'cat-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white text-slate-700 hover:text-slate-900 border border-slate-200 whitespace-nowrap shadow-xs transition-colors';
+          });
+          btn.className = 'cat-pill px-3 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white whitespace-nowrap shadow-xs';
+          currentFilter.category = btn.getAttribute('data-cat');
+          renderWorkers();
+        });
+      });
+    }
+
+    // --- 🎙️ HINDI VOICE SEARCH (WEB SPEECH RECOGNITION API) ---
+    function setupVoiceSearch() {
+      const voiceBtn = document.getElementById('btn-cust-voice');
+      const searchInput = document.getElementById('input-cust-search');
+      const micIcon = document.getElementById('icon-cust-mic');
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        voiceBtn.addEventListener('click', () => {
+          showCustToast('आपके ब्राउज़र में वॉइस सर्च समर्थित नहीं है। कृपया टाइप करें।');
+        });
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'hi-IN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        micIcon.textContent = 'graphic_eq';
+        voiceBtn.className = 'w-8 h-8 rounded-xl bg-rose-500 text-white animate-pulse flex items-center justify-center transition-all ml-1.5 shrink-0 shadow-md';
+        showCustToast('🎙️ सुन रहे हैं... बोलिए (उदा. "प्लंबर चाहिए" या "सफाई वाली बाई")');
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        searchInput.value = transcript;
+        currentFilter.query = transcript;
+        renderWorkers();
+        showCustToast(`आपने बोला: "${transcript}" ✓`);
+      };
+
+      recognition.onerror = () => {
+        micIcon.textContent = 'mic';
+        voiceBtn.className = 'w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-all ml-1.5 shrink-0 shadow-xs';
+      };
+
+      recognition.onend = () => {
+        micIcon.textContent = 'mic';
+        voiceBtn.className = 'w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-all ml-1.5 shrink-0 shadow-xs';
+      };
+
+      voiceBtn.addEventListener('click', () => {
+        try {
+          recognition.start();
+        } catch (e) {
+          recognition.stop();
+        }
+      });
+    }
+
+    // --- EVENT LISTENERS ---
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCategories();
+      renderWorkers();
+      setupVoiceSearch();
+
+      // Search input
+      const searchInput = document.getElementById('input-cust-search');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          currentFilter.query = e.target.value.trim();
+          renderWorkers();
+        });
+      }
+
+      // Nearby Distance Sort Toggle
+      const nearbyBtn = document.getElementById('btn-nearby-filter');
+      if (nearbyBtn) {
+        nearbyBtn.addEventListener('click', () => {
+          currentFilter.sortByDistance = !currentFilter.sortByDistance;
+          if (currentFilter.sortByDistance) {
+            nearbyBtn.className = 'flex-1 py-1.5 px-2 text-center rounded-xl bg-emerald-600 text-white transition-all whitespace-nowrap font-bold flex items-center justify-center gap-1 shadow-xs';
+            showCustToast('📍 आपके सबसे नजदीक के कारीगर सबसे ऊपर हैं!');
+          } else {
+            nearbyBtn.className = 'flex-1 py-1.5 px-2 text-center rounded-xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-all whitespace-nowrap font-bold flex items-center justify-center gap-1';
+          }
+          renderWorkers();
+        });
+      }
+
+      // Rate Filter Buttons
+      document.querySelectorAll('.rate-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.rate-filter-btn').forEach(b => {
+            b.className = 'rate-filter-btn flex-1 py-1.5 px-2 text-center rounded-xl text-slate-600 hover:text-slate-900 transition-all whitespace-nowrap';
+          });
+          btn.className = 'rate-filter-btn flex-1 py-1.5 px-2 text-center rounded-xl bg-slate-900 text-white shadow-xs transition-all whitespace-nowrap';
+          currentFilter.rate = btn.getAttribute('data-rate');
+          renderWorkers();
+        });
+      });
+
+      // Post Job Modal
+      const postJobBtn = document.getElementById('btn-cust-post-job');
+      const postJobModal = document.getElementById('modal-post-job');
+      const closePostJob = document.getElementById('btn-close-post-job');
+      const submitPostJob = document.getElementById('btn-submit-post-job');
+      const shareWaBtn = document.getElementById('btn-share-whatsapp-job');
+
+      if (postJobBtn && postJobModal) {
+        postJobBtn.addEventListener('click', () => {
+          postJobModal.classList.remove('hidden');
+          postJobModal.classList.add('flex');
+        });
+      }
+      if (closePostJob && postJobModal) {
+        closePostJob.addEventListener('click', () => {
+          postJobModal.classList.add('hidden');
+          postJobModal.classList.remove('flex');
+        });
+      }
+      if (submitPostJob) {
+        submitPostJob.addEventListener('click', () => {
+          showCustToast('काम पोस्ट हो गया! कारीगरों को नोटिफिकेशन भेज दिया गया है।');
+          postJobModal.classList.add('hidden');
+          postJobModal.classList.remove('flex');
+        });
+      }
+
+      // WhatsApp Share Job
+      if (shareWaBtn) {
+        shareWaBtn.addEventListener('click', () => {
+          const title = document.getElementById('post-job-title').value || 'कारीगर / मजदूर चाहिए';
+          const loc = document.getElementById('post-job-locality').value || 'अम्बाला';
+          const budget = document.getElementById('post-job-budget').value || 'तय मजदूरी';
+          const text = encodeURIComponent(`📢 नया काम उपलब्ध (अम्बाला वर्कर): \n🔹 काम: ${title}\n📍 इलाका: ${loc}\n💰 बजट: ${budget}\n👉 कामगार तुरंत संपर्क करें: http://localhost:8085/worker.html`);
+          window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        });
+      }
+
+      // Bottom Nav buttons
+      document.getElementById('nav-tab-post').addEventListener('click', () => {
+        postJobModal.classList.remove('hidden');
+        postJobModal.classList.add('flex');
+      });
+      document.getElementById('nav-tab-workers').addEventListener('click', () => {
+        document.getElementById('cust-workers-list').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
