@@ -21,9 +21,9 @@
       const cfg = localStorage.getItem(GITHUB_CONFIG_KEY);
       if (cfg) {
         const parsed = JSON.parse(cfg);
-        // Correct any typos if present
         if (parsed.owner === 'ank420kit') parsed.owner = 'an420kit';
         if (parsed.repo === 'aambala-worker') parsed.repo = 'ambala-worker';
+        if (!parsed.token) parsed.token = DEFAULT_CONFIG.token;
         return parsed;
       }
       localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(DEFAULT_CONFIG));
@@ -93,7 +93,6 @@
   async function fetchJSONFile(path) {
     const cfg = getGitHubConfig();
     if (!cfg || !cfg.token) {
-      // Fallback to local data file
       try {
         const localRes = await fetch(path);
         return await localRes.json();
@@ -134,7 +133,6 @@
     }
 
     try {
-      // 1. Get current SHA of the file
       let currentSha = null;
       const getUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}?ref=${cfg.branch}`;
       const getRes = await fetch(getUrl, {
@@ -148,11 +146,9 @@
         currentSha = fileInfo.sha;
       }
 
-      // 2. Base64 encode the new content
       const contentStr = JSON.stringify(jsonData, null, 2);
       const contentBase64 = btoa(unescape(encodeURIComponent(contentStr)));
 
-      // 3. Put request to commit
       const putBody = {
         message: commitMessage,
         content: contentBase64,
@@ -176,19 +172,19 @@
         const commitData = await putRes.json();
         return {
           success: true,
-          message: 'डेटा GitHub Private Repo में सुरक्षित सेव हो गया!',
+          message: `${path} GitHub रेपो में सुरक्षित सेव हो गया!`,
           commitSha: commitData.commit.sha
         };
       } else {
         const err = await putRes.json().catch(() => ({}));
-        return { success: false, message: `सेव विफल: ${err.message || 'त्रुटि'}` };
+        return { success: false, message: `सेव विफल (${path}): ${err.message || 'त्रुटि'}` };
       }
     } catch (e) {
-      return { success: false, message: `अपडेट त्रुटि: ${e.message}` };
+      return { success: false, message: `अपडेट त्रुटि (${path}): ${e.message}` };
     }
   }
 
-  // Push all data files (workers, jobs, localities) to GitHub
+  // Push all 7 data files to GitHub repo data/ folder
   async function pushAllData() {
     const cfg = getGitHubConfig();
     if (!cfg || !cfg.token) {
@@ -196,28 +192,33 @@
     }
 
     const filesToSync = [
-      { path: 'data/workers.json', fallback: 'data/workers.json' },
-      { path: 'data/jobs.json', fallback: 'data/jobs.json' },
-      { path: 'data/localities.json', fallback: 'data/localities.json' }
+      { path: 'data/workers.json', getData: () => window.AMBALA_DATA?.getStoredWorkers?.() || [] },
+      { path: 'data/pending_workers.json', getData: () => window.AMBALA_DATA?.getPendingWorkers?.() || [] },
+      { path: 'data/rejected_workers.json', getData: () => window.AMBALA_DATA?.getRejectedWorkers?.() || [] },
+      { path: 'data/customers.json', getData: () => window.AMBALA_DATA?.getStoredCustomers?.() || [] },
+      { path: 'data/jobs.json', getData: () => window.AMBALA_DATA?.getStoredJobs?.() || [] },
+      { path: 'data/categories.json', getData: () => window.AMBALA_DATA?.getStoredCategories?.() || [] },
+      { path: 'data/localities.json', getData: () => window.AMBALA_DATA?.getStoredLocalities?.() || [] }
     ];
 
     const results = [];
     for (const item of filesToSync) {
       try {
-        let contentToPush = null;
-        if (item.path === 'data/workers.json' && window.AMBALA_DATA && window.AMBALA_DATA.workers) {
-          contentToPush = window.AMBALA_DATA.workers;
-        } else if (item.path === 'data/localities.json' && window.AMBALA_DATA && window.AMBALA_DATA.localities) {
-          contentToPush = window.AMBALA_DATA.localities;
-        } else {
-          const res = await fetch(item.fallback);
-          if (res.ok) contentToPush = await res.json();
+        let contentToPush = item.getData();
+        if (!contentToPush || (Array.isArray(contentToPush) && contentToPush.length === 0)) {
+          // If empty locally, check if local file has content
+          try {
+            const res = await fetch(item.path);
+            if (res.ok) {
+              const fileContent = await res.json();
+              if (Array.isArray(fileContent) && fileContent.length > 0) contentToPush = fileContent;
+            }
+          } catch (e) {}
         }
+        if (!contentToPush) contentToPush = [];
 
-        if (contentToPush) {
-          const commitRes = await commitJSONFile(item.path, contentToPush, `Sync ${item.path} from Ambala Admin`);
-          results.push({ path: item.path, ...commitRes });
-        }
+        const commitRes = await commitJSONFile(item.path, contentToPush, `Sync ${item.path} database from Ambala Admin`);
+        results.push({ path: item.path, ...commitRes });
       } catch (err) {
         results.push({ path: item.path, success: false, message: err.message });
       }
@@ -228,12 +229,12 @@
       success: allSuccess,
       results,
       message: allSuccess 
-        ? `सभी ${results.length} डेटाबेस फाइल्स GitHub Private Repo में सफलतापूर्वक सिंक हो गईं!` 
+        ? `सभी 7 डेटाबेस फाइल्स (data/*) GitHub Repo में सफलतापूर्वक सिंक हो गईं!` 
         : `कुछ फाइल्स सिंक नहीं हो पाईं: ${results.filter(r => !r.success).map(r => r.path).join(', ')}`
     };
   }
 
-  // Pull all data files from GitHub
+  // Pull all data files from GitHub repo
   async function pullAllData() {
     const cfg = getGitHubConfig();
     if (!cfg || !cfg.token) {
@@ -242,17 +243,24 @@
 
     try {
       const workersFile = await fetchJSONFile('data/workers.json');
+      const pendingFile = await fetchJSONFile('data/pending_workers.json');
+      const rejectedFile = await fetchJSONFile('data/rejected_workers.json');
+      const customersFile = await fetchJSONFile('data/customers.json');
       const jobsFile = await fetchJSONFile('data/jobs.json');
       const localitiesFile = await fetchJSONFile('data/localities.json');
+      const categoriesFile = await fetchJSONFile('data/categories.json');
 
-      if (workersFile && workersFile.data && window.AMBALA_DATA) {
-        window.AMBALA_DATA.workers = workersFile.data;
-        localStorage.setItem('ambala_workers', JSON.stringify(workersFile.data));
-      }
+      if (workersFile && workersFile.data) localStorage.setItem('ambala_workers', JSON.stringify(workersFile.data));
+      if (pendingFile && pendingFile.data) localStorage.setItem('ambala_pending_workers', JSON.stringify(pendingFile.data));
+      if (rejectedFile && rejectedFile.data) localStorage.setItem('ambala_rejected_workers', JSON.stringify(rejectedFile.data));
+      if (customersFile && customersFile.data) localStorage.setItem('ambala_customers', JSON.stringify(customersFile.data));
+      if (jobsFile && jobsFile.data) localStorage.setItem('ambala_jobs', JSON.stringify(jobsFile.data));
+      if (localitiesFile && localitiesFile.data) localStorage.setItem('ambala_master_localities', JSON.stringify(localitiesFile.data));
+      if (categoriesFile && categoriesFile.data) localStorage.setItem('ambala_master_categories', JSON.stringify(categoriesFile.data));
 
       return {
         success: true,
-        message: 'GitHub से ताज़ा डेटाबेस लोड हो गया!'
+        message: 'GitHub से सभी 7 डेटाबेस फाइल्स लोड हो गईं!'
       };
     } catch (e) {
       return { success: false, message: `डेटा फेच त्रुटि: ${e.message}` };
