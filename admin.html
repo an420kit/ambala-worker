@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="hi" class="h-full">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>अम्बाला वर्कर - एडमिन पोर्टल (Admin Portal)</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0f172a"/>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg"/>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..500,0..1,0" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/style.css?v=3.1"/>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- ==========================================================================
+       ADMIN HEADER (Standalone - With Prominent Logout)
+       ========================================================================== -->
+  <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-lg">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center font-black text-sm shadow-md">
+          AW
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm md:text-base font-extrabold text-white">अम्बाला वर्कर एडमिन पोर्टल</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">Master Admin</span>
+          </div>
+          <p class="text-[11px] text-slate-400">सिस्टम कंट्रोल, कामगार सत्यापन, कमाई व ऐड्स मैनेजर</p>
+        </div>
+      </div>
+
+      <!-- Action & Logout -->
+      <div class="flex items-center gap-2.5">
+        <div class="hidden sm:flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded-xl border border-slate-700 text-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-slate-300">ऑनलाइन</span>
+        </div>
+        <button id="btn-admin-logout" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-1.5" type="button" title="लॉगिन पोर्टल पर वापस जाएं">
+          <span class="material-symbols-outlined text-[16px]">logout</span>
+          <span>लॉगआउट</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 flex flex-col gap-4">
+
+    <!-- 5 Stats Cards (Including Revenue & Monetization) -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div class="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/80 shadow-md">
+        <div class="flex items-center justify-between text-slate-400 text-xs">
+          <span>कुल कामगार</span>
+          <span class="material-symbols-outlined text-emerald-400 text-[18px]">engineering</span>
+        </div>
+        <div class="text-2xl font-black text-white mt-1" id="stat-total-workers">14</div>
+        <span class="text-[10px] text-emerald-400">सत्यापित सक्रिय</span>
+      </div>
+
+      <div class="bg-amber-950/30 p-3.5 rounded-2xl border border-amber-600/40 shadow-md">
+        <div class="flex items-center justify-between text-amber-400 text-xs">
+          <span>पेंडिंग KYC</span>
+          <span class="material-symbols-outlined text-amber-400 text-[18px]">pending_actions</span>
+        </div>
+        <div class="text-2xl font-black text-amber-300 mt-1" id="stat-pending-kyc">1</div>
+        <span class="text-[10px] text-amber-400">तुरंत ध्यान दें</span>
+      </div>
+
+      <div class="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/80 shadow-md">
+        <div class="flex items-center justify-between text-slate-400 text-xs">
+          <span>जॉब लीड्स</span>
+          <span class="material-symbols-outlined text-blue-400 text-[18px]">work</span>
+        </div>
+        <div class="text-2xl font-black text-white mt-1" id="stat-total-jobs">8</div>
+        <span class="text-[10px] text-blue-400">ग्राहकों द्वारा पोस्ट</span>
+      </div>
+
+      <div class="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/80 shadow-md">
+        <div class="flex items-center justify-between text-slate-400 text-xs">
+          <span>गांव व कस्बे</span>
+          <span class="material-symbols-outlined text-purple-400 text-[18px]">location_on</span>
+        </div>
+        <div class="text-2xl font-black text-white mt-1" id="stat-total-locations">60+</div>
+        <span class="text-[10px] text-purple-400">अम्बाला मास्टर</span>
+      </div>
+
+      <!-- Monetization Revenue Card -->
+      <div class="col-span-2 md:col-span-1 bg-gradient-to-br from-emerald-950/60 to-slate-900 p-3.5 rounded-2xl border border-emerald-500/40 shadow-md">
+        <div class="flex items-center justify-between text-emerald-400 text-xs">
+          <span class="font-bold">मासिक कमाई (Ads)</span>
+          <span class="material-symbols-outlined text-emerald-400 text-[18px]">payments</span>
+        </div>
+        <div class="text-2xl font-black text-emerald-300 mt-1" id="stat-monthly-revenue">₹3,850</div>
+        <span class="text-[10px] text-emerald-400/80">ऐड्स + VIP लिस्टिंग</span>
+      </div>
+    </div>
+
+    <!-- Admin Sub-Navigation Tabs -->
+    <div class="bg-slate-800/90 p-1.5 rounded-2xl border border-slate-700 flex gap-1 text-xs font-bold overflow-x-auto no-scrollbar">
+      <button class="admin-tab-btn flex-1 py-2 px-3 rounded-xl bg-purple-600 text-white shadow-sm transition-all text-center flex items-center justify-center gap-1.5 whitespace-nowrap" data-tab="tab-approvals">
+        <span class="material-symbols-outlined text-[17px]">verified_user</span>
+        <span>कामगार सत्यापन (KYC)</span>
+      </button>
+      <button class="admin-tab-btn flex-1 py-2 px-3 rounded-xl text-slate-300 hover:text-white transition-all text-center flex items-center justify-center gap-1.5 whitespace-nowrap" data-tab="tab-locations">
+        <span class="material-symbols-outlined text-[17px]">pin_drop</span>
+        <span>लोकेशन मैनेजर (60+)</span>
+      </button>
+      <button class="admin-tab-btn flex-1 py-2 px-3 rounded-xl text-slate-300 hover:text-white transition-all text-center flex items-center justify-center gap-1.5 whitespace-nowrap" data-tab="tab-categories">
+        <span class="material-symbols-outlined text-[17px]">handyman</span>
+        <span>काम प्रकार (Trades)</span>
+      </button>
+      <button class="admin-tab-btn flex-1 py-2 px-3 rounded-xl text-slate-300 hover:text-white transition-all text-center flex items-center justify-center gap-1.5 whitespace-nowrap" data-tab="tab-ads">
+        <span class="material-symbols-outlined text-[17px]">campaign</span>
+        <span>विज्ञापन / बैनर (Ads)</span>
+      </button>
+      <button class="admin-tab-btn flex-1 py-2 px-3 rounded-xl text-slate-300 hover:text-white transition-all text-center flex items-center justify-center gap-1.5 whitespace-nowrap" data-tab="tab-github">
+        <span class="material-symbols-outlined text-[17px]">database</span>
+        <span>⚙️ GitHub डेटाबेस</span>
+      </button>
+    </div>
+
+    <!-- ========================================================================
+         TAB 1: WORKER KYC APPROVALS
+         ======================================================================== -->
+    <section id="tab-approvals" class="admin-tab-content flex flex-col gap-3">
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-700 pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-bold text-sm">पेंडिंग सत्यापन (Pending Approvals)</span>
+            <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">1 नया अनुरोध</span>
+          </div>
+          <span class="text-xs text-slate-400">KYC डॉक्यूमेंट्स चेक करें</span>
+        </div>
+
+        <!-- Pending Card -->
+        <div id="admin-pending-card" class="bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center text-xl font-black shrink-0">
+              V
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="text-sm font-bold text-white">Vikram Mistri</h4>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">टाइल व फर्श मिस्त्री</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">📍 गांव पंजोखरा साहिब • 📞 9812345099</p>
+              <p class="text-xs text-emerald-400 mt-1 font-mono">दरें: ₹160/घंटा • ₹900/दिन • ₹5,400/हफ्ता • ₹23,000/माह</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">📄 आधार कार्ड सत्यापित</span>
+                <span class="text-[10px] text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">📸 फोटो अपलोड</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex sm:flex-col gap-2 shrink-0">
+            <button id="btn-approve-vikram" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1 active:scale-95" type="button">
+              <span class="material-symbols-outlined text-[16px]">check_circle</span>
+              <span>स्वीकृत करें (Approve)</span>
+            </button>
+            <button id="btn-reject-vikram" class="flex-1 px-4 py-2 bg-slate-800 hover:bg-rose-900/40 text-slate-300 hover:text-rose-300 rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center justify-center gap-1" type="button">
+              <span class="material-symbols-outlined text-[16px]">cancel</span>
+              <span>अस्वीकृत</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Approved Active Workers List with VIP Toggle -->
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold text-white">सक्रिय सत्यापित कामगार (14 Active Workers)</h3>
+          <span class="text-xs text-slate-400">VIP बैज से ऐप में टॉप पर दिखाएं</span>
+        </div>
+        <div class="flex flex-col gap-2.5" id="admin-approved-workers-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 2: LOCATION MANAGER
+         ======================================================================== -->
+    <section id="tab-locations" class="admin-tab-content hidden flex flex-col gap-3">
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <h3 class="text-sm font-bold text-white mb-2">नया गांव या कस्बा जोड़ें</h3>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input id="input-new-loc-name" class="flex-1 px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500" placeholder="उदा. साहा गांव, मुलाना, केसरी, शहजादपुर..." />
+          <select id="select-new-loc-type" class="px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500">
+            <option value="village">गांव (Village)</option>
+            <option value="town">कस्बा (Town)</option>
+            <option value="sector">सेक्टर (Sector)</option>
+            <option value="colony">कॉलोनी (Colony)</option>
+          </select>
+          <button id="btn-add-location" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 shrink-0" type="button">
+            + नया इलाका जोड़ें
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold text-white">अम्बाला मास्टर 60+ लोकेशन नेटवर्क</h3>
+          <span class="text-xs text-purple-400 font-bold" id="admin-locations-badge">62 इलाके सक्रिय</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-[500px] overflow-y-auto pr-1" id="admin-locations-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 3: TRADE CATEGORIES
+         ======================================================================== -->
+    <section id="tab-categories" class="admin-tab-content hidden flex flex-col gap-3">
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <h3 class="text-sm font-bold text-white mb-2">नया काम / पेशा जोड़ें (New Trade)</h3>
+        <div class="flex gap-2">
+          <input id="input-new-trade-name" class="flex-1 px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500" placeholder="उदा. सोफा रिपेयर, हलवाई, सोलर पैनल मैकेनिक, बोरवेल..." />
+          <button id="btn-add-trade" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 shrink-0" type="button">
+            + पेशा जोड़ें
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <h3 class="text-sm font-bold text-white mb-3">सक्रिय काम श्रेणियां (Universal Trades)</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="admin-trades-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 4: ADS & BANNERS (Monetization)
+         ======================================================================== -->
+    <section id="tab-ads" class="admin-tab-content hidden flex flex-col gap-3">
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <h3 class="text-sm font-bold text-white mb-2">नया विज्ञापन / स्पॉन्सर बैनर लाइव करें</h3>
+        <form id="admin-ad-form" class="flex flex-col gap-3" onsubmit="event.preventDefault();">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input id="input-ad-title" class="px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500" placeholder="विज्ञापन शीर्षक (उदा. मकान पुट्टी-पेंट मेला 15% छूट)" required />
+            <input id="input-ad-subtitle" class="px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500" placeholder="विवरण (उदा. तुरंत फ्री कोटेशन व पक्का काम)" required />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="text-[10px] text-slate-400 font-bold block mb-1">विज्ञापन कहाँ दिखेगा</label>
+              <select id="select-ad-target" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                <option value="both">🌐 दोनों ऐप (Both Apps)</option>
+                <option value="customer">🛒 सिर्फ ग्राहक ऐप</option>
+                <option value="worker">👷 सिर्फ लेबर ऐप</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 font-bold block mb-1">फोटो बैनर चुनें</label>
+              <select id="select-ad-banner" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                <option value="assets/hero_banner.jpg">🖼️ अम्बाला वर्कर हीरो फोटो</option>
+                <option value="assets/worker_manoj.jpg">🎨 पेंटर व पुट्टी स्पेशल</option>
+                <option value="assets/worker_rajesh.jpg">⚡ बिजली व मोटर रिपेयर</option>
+                <option value="assets/worker_babloo.jpg">🔧 प्लंबर व टंकी रिपेयर</option>
+                <option value="assets/worker_sunita.jpg">🧹 बाई व घरेलू काम</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 font-bold block mb-1">कॉल हेतु संपर्क नंबर</label>
+              <input id="input-ad-phone" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="9812345000" required />
+            </div>
+          </div>
+          <button id="btn-publish-ad" class="py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-md active:scale-95" type="submit">
+            विज्ञापन तुरंत लाइव करें ➔
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <h3 class="text-sm font-bold text-white mb-3">सक्रिय विज्ञापन सूची (Active Ads)</h3>
+        <div class="flex flex-col gap-2" id="admin-ads-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 5: GITHUB PRIVATE REPO DATABASE MANAGER
+         ======================================================================== -->
+    <section id="tab-github" class="admin-tab-content hidden flex flex-col gap-3">
+      <div class="bg-slate-800/80 p-5 rounded-3xl border border-slate-700 shadow-sm flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-bold text-white">🔒 GitHub Private Repo Database</h3>
+              <span id="github-conn-badge" class="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 text-[10px] font-bold">⚪ नॉट कनेक्टेड</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">अपनी प्राइवेट GitHub रिपॉजिटरी को 100% फ्री व सुरक्षित डेटाबेस की तरह इस्तेमाल करें</p>
+          </div>
+          <span class="text-2xl">🐙</span>
+        </div>
+
+        <form id="form-github-config" class="flex flex-col gap-3" onsubmit="event.preventDefault();">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-slate-300" for="gh-owner">1. GitHub यूजरनेम (Owner) *</label>
+              <input id="gh-owner" type="text" class="px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500" value="an420kit" placeholder="उदा. an420kit" required />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-slate-300" for="gh-repo">2. रेपो का नाम (Repository) *</label>
+              <input id="gh-repo" type="text" class="px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500" value="ambala-worker" placeholder="उदा. ambala-worker" required />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-slate-300" for="gh-token">3. GitHub Personal Access Token (PAT) *</label>
+            <div class="relative flex items-center bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 focus-within:border-purple-500">
+              <input id="gh-token" type="password" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-mono" value="" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" required />
+              <button type="button" id="btn-toggle-gh-token" class="text-slate-400 hover:text-white text-xs px-1" onclick="window.toggleTokenView()">👁️</button>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-0.5">
+              💡 <strong>नोट:</strong> फाइलें अपलोड करने के लिए टोकन में <strong>Contents: Read and write</strong> परमिशन होनी चाहिए। सबसे आसान है 
+              <a href="https://github.com/settings/tokens/new" target="_blank" class="text-purple-400 underline font-bold">Classic Token (repo टिक करें)</a> बनाना।
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2 pt-2">
+            <button id="btn-gh-test" type="button" class="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 active:scale-95">
+              <span>🔗</span>
+              <span>कनेक्शन टेस्ट करें (Test Connection)</span>
+            </button>
+            <button id="btn-gh-save" type="button" class="flex-1 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95">
+              <span>💾</span>
+              <span>सेव करें (Save Config)</span>
+            </button>
+          </div>
+
+          <div class="border-t border-slate-700/80 pt-3 flex flex-col sm:flex-row gap-2">
+            <button id="btn-gh-push-all" type="button" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95">
+              <span>⬆️</span>
+              <span>सारा डेटाबेस GitHub में सुरक्षित अपलोड करें</span>
+            </button>
+            <button id="btn-gh-pull-all" type="button" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95">
+              <span>⬇️</span>
+              <span>GitHub से डेटा रीफ्रेश करें</span>
+            </button>
+          </div>
+
+          <div id="gh-sync-status" class="hidden p-3 rounded-xl bg-slate-900 border border-slate-700 text-xs">
+            <!-- Sync log message -->
+          </div>
+        </form>
+
+        <div class="p-3.5 bg-slate-900/80 rounded-2xl border border-slate-700 text-xs">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-bold text-slate-200">📁 कौन-कौन सी फाइल्स प्राइवेट रेपो में डेटाबेस बनेंगी:</span>
+            <a id="gh-repo-link" href="#" target="_blank" class="hidden text-[11px] text-purple-400 hover:underline flex items-center gap-1">
+              <span>अपनी प्राइवेट रेपो खोलें ↗</span>
+            </a>
+          </div>
+          <ul class="text-[11px] text-slate-400 space-y-1 list-disc list-inside">
+            <li><strong class="text-slate-300">data/workers.json:</strong> 14+ कामगारों का डेटा, आधार KYC और दरें।</li>
+            <li><strong class="text-slate-300">data/jobs.json:</strong> ग्राहकों द्वारा पोस्ट किए गए काम।</li>
+            <li><strong class="text-slate-300">data/localities.json:</strong> 60+ अम्बाला गांव व कस्बे।</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="admin-toast" class="fixed bottom-5 right-5 z-[9999] bg-emerald-500 text-slate-950 px-4 py-2.5 rounded-2xl font-bold text-xs shadow-2xl transition-all duration-300 opacity-0 pointer-events-none translate-y-3 flex items-center gap-2">
+    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+    <span id="admin-toast-text">सफलतापूर्वक अपडेट हो गया!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js?v=3.2"></script>
+  <script src="js/github-db.js?v=3.2"></script>
+  <script>
+    // --- CACHE BUSTER SCRIPT ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      });
+    }
+
+    // --- TOAST HELPER ---
+    function showAdminToast(msg) {
+      const toast = document.getElementById('admin-toast');
+      const text = document.getElementById('admin-toast-text');
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+      }, 3000);
+    }
+
+    // --- TAB SWITCHER ---
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.admin-tab-btn').forEach(b => {
+          b.classList.remove('bg-purple-600', 'text-white');
+          b.classList.add('text-slate-300');
+        });
+        btn.classList.add('bg-purple-600', 'text-white');
+        btn.classList.remove('text-slate-300');
+
+        document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+        const targetId = btn.getAttribute('data-tab');
+        const target = document.getElementById(targetId);
+        if (target) target.classList.remove('hidden');
+      });
+    });
+
+    // --- LOGOUT BUTTON ---
+    document.getElementById('btn-admin-logout').addEventListener('click', () => {
+      localStorage.removeItem('ambala_auth_session');
+      window.location.href = 'index.html';
+    });
+
+    // --- POPULATE APPROVED WORKERS WITH VIP BOOST ---
+    function renderApprovedWorkers() {
+      const list = document.getElementById('admin-approved-workers-list');
+      if (!list) return;
+      const workers = window.AMBALA_DATA ? window.AMBALA_DATA.workers : [];
+      list.innerHTML = workers.map(w => `
+        <div class="bg-slate-900/70 p-3 rounded-2xl border border-slate-700/60 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-3">
+            <img src="${w.avatar || 'assets/worker_rajesh.jpg'}" class="w-11 h-11 rounded-xl object-cover border border-slate-700" alt="${w.name}"/>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-white text-sm">${w.name}</span>
+                <span class="text-emerald-400">✓</span>
+                <span class="text-[10px] text-slate-400">(${w.roleHi || w.category})</span>
+              </div>
+              <p class="text-[11px] text-slate-400">📍 ${w.townOrVillage || 'अम्बाला'} • 📞 ${w.phone}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleVipBoost('${w.id}', this)" class="px-2.5 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500 hover:text-slate-950 text-amber-300 border border-amber-500/30 text-[10px] font-bold transition-all flex items-center gap-1 active:scale-95">
+              <span>⭐</span>
+              <span>VIP बूस्ट</span>
+            </button>
+            <div class="text-right">
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">सक्रिय</span>
+              <span class="text-[11px] text-slate-300 block mt-0.5">₹${w.dailyRate || 800}/दिन</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.toggleVipBoost = function(workerId, btn) {
+      btn.classList.toggle('bg-amber-400');
+      btn.classList.toggle('text-slate-950');
+      showAdminToast('Worker VIP Boost स्टेटस अपडेट हो गया! (ग्राहक ऐप में सबसे ऊपर दिखेगा)');
+    };
+
+    // --- POPULATE LOCATIONS ---
+    function renderLocations() {
+      const grid = document.getElementById('admin-locations-grid');
+      if (!grid) return;
+      const locs = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredLocalities() : [];
+      grid.innerHTML = locs.map(l => `
+        <div class="bg-slate-900/70 px-2.5 py-1.5 rounded-xl border border-slate-700/60 text-xs flex items-center justify-between">
+          <span class="text-slate-300 truncate">${l.nameHi || l.nameEn}</span>
+          <span class="text-[9px] px-1.5 py-0.5 rounded ${l.type === 'village' ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'}">${l.type === 'village' ? 'गांव' : 'कस्बा'}</span>
+        </div>
+      `).join('');
+    }
+
+    // --- POPULATE TRADES ---
+    function renderTrades() {
+      const grid = document.getElementById('admin-trades-grid');
+      if (!grid) return;
+      const trades = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredCategories() : [];
+      grid.innerHTML = trades.map(t => `
+        <div class="bg-slate-900/70 p-2.5 rounded-xl border border-slate-700/60 text-xs flex items-center justify-between">
+          <span class="text-slate-200 font-medium">${t.icon || '🛠️'} ${t.nameHi || t.nameEn}</span>
+          <span class="text-emerald-400 text-xs font-bold">✓ चालू</span>
+        </div>
+      `).join('');
+    }
+
+    // --- POPULATE ADS ---
+    function renderAds() {
+      const container = document.getElementById('admin-ads-container');
+      if (!container) return;
+      const ads = window.AMBALA_DATA ? window.AMBALA_DATA.ads : [];
+      container.innerHTML = ads.map(a => `
+        <div class="bg-slate-900/70 p-3 rounded-2xl border border-slate-700 flex items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-3">
+            <img src="${a.photo || 'assets/hero_banner.jpg'}" class="w-14 h-10 rounded-lg object-cover border border-slate-700" alt="Ad"/>
+            <div>
+              <span class="font-bold text-white block">${a.titleHi || a.title || 'अम्बाला ऑफर'}</span>
+              <span class="text-slate-400 text-[11px] block">${a.subtitleHi || a.subtitle || '15% छूट'}</span>
+              <span class="text-[10px] text-emerald-400 font-mono mt-0.5">📞 ${a.phone} • स्पॉन्सर पार्टनर</span>
+            </div>
+          </div>
+          <span class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">🟢 लाइव सक्रिय</span>
+        </div>
+      `).join('');
+    }
+
+    // --- EVENT LISTENERS ---
+    document.addEventListener('DOMContentLoaded', () => {
+      renderApprovedWorkers();
+      renderLocations();
+      renderTrades();
+      renderAds();
+
+      // Approve Vikram
+      const approveBtn = document.getElementById('btn-approve-vikram');
+      if (approveBtn) {
+        approveBtn.addEventListener('click', () => {
+          const card = document.getElementById('admin-pending-card');
+          if (card) {
+            card.innerHTML = `<div class="p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-emerald-300 font-bold text-xs flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">check_circle</span>
+              <span>Vikram Mistri सफलतापूर्वक स्वीकृत हो गए! प्रोफाइल तुरंत लाइव कर दी गई है।</span>
+            </div>`;
+          }
+          document.getElementById('stat-pending-kyc').textContent = '0';
+          document.getElementById('stat-total-workers').textContent = '15';
+          showAdminToast('Vikram Mistri स्वीकृत हो गए!');
+        });
+      }
+
+      // Add Location
+      const addLocBtn = document.getElementById('btn-add-location');
+      if (addLocBtn) {
+        addLocBtn.addEventListener('click', () => {
+          const input = document.getElementById('input-new-loc-name');
+          const typeSelect = document.getElementById('select-new-loc-type');
+          if (input && input.value.trim()) {
+            if (window.AMBALA_DATA && window.AMBALA_DATA.addMasterLocality) {
+              window.AMBALA_DATA.addMasterLocality(input.value.trim(), typeSelect.value);
+            }
+            renderLocations();
+            showAdminToast(`${input.value.trim()} जोड़ दिया गया!`);
+            input.value = '';
+          }
+        });
+      }
+
+      // Add Trade
+      const addTradeBtn = document.getElementById('btn-add-trade');
+      if (addTradeBtn) {
+        addTradeBtn.addEventListener('click', () => {
+          const input = document.getElementById('input-new-trade-name');
+          if (input && input.value.trim()) {
+            if (window.AMBALA_DATA && window.AMBALA_DATA.addMasterCategory) {
+              window.AMBALA_DATA.addMasterCategory(input.value.trim());
+            }
+            renderTrades();
+            showAdminToast(`${input.value.trim()} पेशा जोड़ दिया गया!`);
+            input.value = '';
+          }
+        });
+      }
+
+      // GitHub DB Config Handlers
+      if (window.AMBALA_GITHUB_DB) {
+        const ghCfg = window.AMBALA_GITHUB_DB.getConfig();
+        if (ghCfg) {
+          if (document.getElementById('gh-owner')) document.getElementById('gh-owner').value = ghCfg.owner || '';
+          if (document.getElementById('gh-repo')) document.getElementById('gh-repo').value = ghCfg.repo || '';
+          if (document.getElementById('gh-token')) document.getElementById('gh-token').value = ghCfg.token || '';
+          const badge = document.getElementById('github-conn-badge');
+          if (badge) {
+            badge.textContent = '🟡 सेव है (टेस्ट करें)';
+            badge.className = 'px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30';
+          }
+        }
+
+        const ghSaveBtn = document.getElementById('btn-gh-save');
+        if (ghSaveBtn) {
+          ghSaveBtn.addEventListener('click', () => {
+            const owner = document.getElementById('gh-owner').value.trim();
+            const repo = document.getElementById('gh-repo').value.trim();
+            const token = document.getElementById('gh-token').value.trim();
+            if (!owner || !repo || !token) {
+              alert('कृपया सभी फ़ील्ड (Owner, Repo, Token) भरें');
+              return;
+            }
+            window.AMBALA_GITHUB_DB.saveConfig(owner, repo, token);
+            showAdminToast('GitHub डेटाबेस सेटिंग्स सुरक्षित हो गईं!');
+          });
+        }
+
+        const ghTestBtn = document.getElementById('btn-gh-test');
+        if (ghTestBtn) {
+          ghTestBtn.addEventListener('click', async () => {
+            const owner = document.getElementById('gh-owner').value.trim();
+            const repo = document.getElementById('gh-repo').value.trim();
+            const token = document.getElementById('gh-token').value.trim();
+            window.AMBALA_GITHUB_DB.saveConfig(owner, repo, token);
+
+            ghTestBtn.textContent = '⏳ टेस्टिंग चालू है...';
+            const res = await window.AMBALA_GITHUB_DB.testConnection();
+            ghTestBtn.innerHTML = '<span>🔗</span><span>कनेक्शन टेस्ट करें</span>';
+
+            const badge = document.getElementById('github-conn-badge');
+            const repoLink = document.getElementById('gh-repo-link');
+            if (res.success) {
+              if (badge) {
+                badge.textContent = '🟢 कनेक्टेड (Connected)';
+                badge.className = 'px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30';
+              }
+              if (repoLink && owner && repo) {
+                repoLink.href = `https://github.com/${owner}/${repo}`;
+                repoLink.classList.remove('hidden');
+              }
+              showAdminToast('शानदार! GitHub Private Repo सफलतापूर्वक कनेक्ट हो गई!');
+            } else {
+              if (badge) {
+                badge.textContent = '🔴 कनेक्शन विफल';
+                badge.className = 'px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/30';
+              }
+              alert(`कनेक्शन विफल: ${res.message}`);
+            }
+          });
+        }
+
+        // Push All Data to GitHub
+        const ghPushBtn = document.getElementById('btn-gh-push-all');
+        if (ghPushBtn) {
+          ghPushBtn.addEventListener('click', async () => {
+            const owner = document.getElementById('gh-owner').value.trim();
+            const repo = document.getElementById('gh-repo').value.trim();
+            const token = document.getElementById('gh-token').value.trim();
+            if (!owner || !repo || !token) {
+              alert('कृपया पहले Owner, Repo और Token भरें!');
+              return;
+            }
+            window.AMBALA_GITHUB_DB.saveConfig(owner, repo, token);
+
+            const statusBox = document.getElementById('gh-sync-status');
+            if (statusBox) {
+              statusBox.classList.remove('hidden');
+              statusBox.innerHTML = '<span class="text-amber-400">⏳ 3 फाइल्स GitHub पर अपलोड हो रही हैं... (workers.json, jobs.json, localities.json)</span>';
+            }
+            ghPushBtn.textContent = '⏳ अपलोड हो रहा है...';
+
+            const res = await window.AMBALA_GITHUB_DB.pushAllData();
+            ghPushBtn.innerHTML = '<span>⬆️</span><span>सारा डेटाबेस GitHub में सुरक्षित अपलोड करें</span>';
+
+            if (res.success) {
+              if (statusBox) {
+                statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ सफलता!</span> <span class="text-slate-200">${res.message}</span>`;
+              }
+              showAdminToast('सभी डेटा फाइल्स GitHub रेपो में सेव हो गईं!');
+            } else {
+              if (statusBox) {
+                statusBox.innerHTML = `<span class="text-rose-400 font-bold">⚠️ त्रुटि:</span> <span class="text-slate-300">${res.message}</span>`;
+              }
+              alert(`अपलोड त्रुटि: ${res.message}`);
+            }
+          });
+        }
+
+        // Pull All Data from GitHub
+        const ghPullBtn = document.getElementById('btn-gh-pull-all');
+        if (ghPullBtn) {
+          ghPullBtn.addEventListener('click', async () => {
+            const statusBox = document.getElementById('gh-sync-status');
+            ghPullBtn.textContent = '⏳ लोड हो रहा है...';
+            const res = await window.AMBALA_GITHUB_DB.pullAllData();
+            ghPullBtn.innerHTML = '<span>⬇️</span><span>GitHub से डेटा रीफ्रेश करें</span>';
+
+            if (res.success) {
+              if (statusBox) {
+                statusBox.classList.remove('hidden');
+                statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ रीफ्रेश सफल!</span> <span class="text-slate-200">${res.message}</span>`;
+              }
+              renderApprovedWorkers();
+              showAdminToast('डेटा रीफ्रेश हो गया!');
+            } else {
+              alert(res.message);
+            }
+          });
+        }
+      }
+
+      window.toggleTokenView = function() {
+        const t = document.getElementById('gh-token');
+        if (t) t.type = t.type === 'password' ? 'text' : 'password';
+      };
+    });
+  </script>
+</body>
+</html>
