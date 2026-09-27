@@ -261,7 +261,7 @@
     function renderWorkers() {
       const list = document.getElementById('cust-workers-list');
       if (!list) return;
-      let workers = window.AMBALA_DATA ? [...(window.AMBALA_DATA.workers || [])] : [];
+      let workers = window.AMBALA_DATA ? [...(window.AMBALA_DATA.getStoredWorkers() || [])] : [];
 
       // Flag top 2 workers as VIP
       workers.forEach((w, idx) => {
@@ -471,7 +471,31 @@
       }
       if (submitPostJob) {
         submitPostJob.addEventListener('click', () => {
-          showCustToast('काम पोस्ट हो गया! कारीगरों को नोटिफिकेशन भेज दिया गया है।');
+          const title = document.getElementById('post-job-title').value.trim();
+          const desc = document.getElementById('post-job-desc').value.trim();
+          const locality = document.getElementById('post-job-locality').value.trim();
+          const budget = document.getElementById('post-job-budget').value.trim();
+          const phone = document.getElementById('post-job-phone').value.trim();
+
+          if (!title || !locality) {
+            alert('कृपया काम का शीर्षक और इलाका अवश्य भरें');
+            return;
+          }
+
+          if (window.AMBALA_DATA && window.AMBALA_DATA.addJob) {
+            window.AMBALA_DATA.addJob({
+              title: title,
+              titleHi: title,
+              desc: desc || title,
+              descHi: desc || title,
+              locality: locality,
+              budget: budget || 'तय मजदूरी',
+              phone: phone || '9812345000'
+            });
+          }
+
+          showCustToast('✅ आपका काम पोस्ट हो गया! कारीगर ऐप (Worker Portal) में तुरंत लाइव दिख रहा है।');
+          document.getElementById('form-post-job').reset();
           postJobModal.classList.add('hidden');
           postJobModal.classList.remove('flex');
         });
