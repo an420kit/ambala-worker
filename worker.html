@@ -297,7 +297,7 @@
     function renderJobs(filter = '') {
       const list = document.getElementById('worker-jobs-list');
       if (!list) return;
-      const jobs = window.AMBALA_DATA ? (window.AMBALA_DATA.postedJobs || []) : [];
+      const jobs = window.AMBALA_DATA ? (window.AMBALA_DATA.getStoredJobs ? window.AMBALA_DATA.getStoredJobs() : (window.AMBALA_DATA.postedJobs || [])) : [];
       const filtered = jobs.filter(j => {
         if (!filter) return true;
         const q = filter.toLowerCase();
@@ -433,13 +433,28 @@
       const regBtn = document.getElementById('btn-submit-reg');
       if (regBtn) {
         regBtn.addEventListener('click', () => {
-          const name = document.getElementById('reg-name').value;
-          const phone = document.getElementById('reg-phone').value;
-          if (!name || !phone) {
-            alert('कृपया नाम और मोबाइल नंबर भरें');
+          const name = document.getElementById('reg-name').value.trim();
+          const phone = document.getElementById('reg-phone').value.trim();
+          const locality = document.getElementById('reg-locality').value.trim();
+          const trade = document.getElementById('reg-trade').value.trim();
+
+          if (!name || !phone || phone.length < 10) {
+            alert('कृपया वैध नाम और 10-अंकों का मोबाइल नंबर भरें');
             return;
           }
-          showWorkerToast(`धन्यवाद ${name}! आपकी प्रोफाइल एडमिन के पास अप्रूवल हेतु भेज दी गई है।`);
+
+          if (window.AMBALA_DATA && window.AMBALA_DATA.registerWorker) {
+            window.AMBALA_DATA.registerWorker({
+              name: name,
+              phone: phone,
+              locality: locality || 'अम्बाला',
+              trade: trade || 'कारीगर',
+              roleHi: trade || 'कारीगर',
+              experience: '5 साल का अनुभव'
+            });
+          }
+
+          showWorkerToast(`धन्यवाद ${name}! आपकी प्रोफाइल एडमिन के पास पेंडिंग अप्रूवल में भेज दी गई है।`);
           document.getElementById('form-new-reg').reset();
         });
       }
