@@ -46,9 +46,9 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-sm md:text-base font-extrabold text-white">अम्बाला वर्कर एडमिन पोर्टल</h1>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">Master Admin</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">Master Admin: an420kit</span>
           </div>
-          <p class="text-[11px] text-slate-400">सिस्टम कंट्रोल, कामगार सत्यापन, कमाई व ऐड्स मैनेजर</p>
+          <p class="text-[11px] text-slate-400">सिस्टम कंट्रोल (an420kit), कामगार सत्यापन, कमाई व ऐड्स मैनेजर</p>
         </div>
       </div>
 
@@ -374,8 +374,12 @@
             </a>
           </div>
           <ul class="text-[11px] text-slate-400 space-y-1 list-disc list-inside">
-            <li><strong class="text-slate-300">data/workers.json:</strong> 14+ कामगारों का डेटा, आधार KYC और दरें।</li>
+            <li><strong class="text-slate-300">data/workers.json:</strong> सक्रिय कामगारों का डेटा, आधार KYC और दरें।</li>
+            <li><strong class="text-slate-300">data/pending_workers.json:</strong> नए कामगार आवेदन व आधार OCR डेटा।</li>
+            <li><strong class="text-slate-300">data/rejected_workers.json:</strong> अस्वीकृत कामगार रिकॉर्ड व कारण।</li>
+            <li><strong class="text-slate-300">data/customers.json:</strong> ग्राहक प्रोफाइल व लॉगिन डेटा (मोबाइल = पासवर्ड)।</li>
             <li><strong class="text-slate-300">data/jobs.json:</strong> ग्राहकों द्वारा पोस्ट किए गए काम।</li>
+            <li><strong class="text-slate-300">data/categories.json:</strong> सभी काम प्रकार / पेशा सूची।</li>
             <li><strong class="text-slate-300">data/localities.json:</strong> 60+ अम्बाला गांव व कस्बे।</li>
           </ul>
         </div>
@@ -423,6 +427,32 @@
           <span>अस्वीकृत करें</span>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal: View Aadhaar Photo -->
+  <div id="modal-view-aadhaar" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-3xl p-5 shadow-2xl flex flex-col gap-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🪪</span>
+          <h3 class="text-sm font-bold text-white">सत्यापन हेतु अपलोड किया गया आधार कार्ड</h3>
+        </div>
+        <button onclick="closeAadhaarModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs">✕</button>
+      </div>
+
+      <div class="w-full h-64 bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-800 p-2">
+        <img id="modal-aadhaar-img" src="" class="max-w-full max-h-full object-contain rounded-lg" alt="Aadhaar Document"/>
+      </div>
+
+      <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
+        <p class="text-slate-400">कामगार: <strong id="modal-aadhaar-worker-name" class="text-white">--</strong></p>
+        <p class="text-slate-400">आधार UID: <strong id="modal-aadhaar-uid" class="text-amber-300 font-mono">--</strong></p>
+        <p class="text-slate-400">मूल स्थायी पता (CV OCR): <span id="modal-aadhaar-perm" class="text-amber-200 font-medium">--</span></p>
+        <p class="text-slate-400">स्थानीय अम्बाला पता: <span id="modal-aadhaar-loc" class="text-slate-200 font-medium">--</span></p>
+      </div>
+
+      <button onclick="closeAadhaarModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition-all">बंद करें</button>
     </div>
   </div>
 
@@ -542,7 +572,7 @@
                   <span class="text-xs text-slate-400">(${w.roleHi || w.roleEn || 'कारीगर'})</span>
                 </div>
                 <p class="text-xs text-slate-300 mt-0.5">
-                  📍 <span class="text-amber-200 font-semibold">${w.townOrVillage || 'अम्बाला'}</span> • 
+                  📍 स्थानीय: <span class="text-amber-200 font-semibold">${w.localAddress || w.townOrVillage || 'अम्बाला'}</span> • 
                   📞 <a href="tel:${w.phone}" class="text-cyan-300 hover:underline font-mono">${w.phone}</a>
                 </p>
               </div>
@@ -553,41 +583,78 @@
             </div>
           </div>
 
-          <!-- Document / KYC Details -->
-          <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-            <div class="flex items-center gap-2">
-              <span class="text-base">🪪</span>
-              <div>
-                <span class="text-slate-300 font-medium">आधार नंबर: <strong class="text-white font-mono">${w.aadhaarNumber || 'जांच हेतु संलग्न'}</strong></span>
-                <span class="text-[10px] text-slate-400 block">दस्तावेज: ${w.aadhaarDocName || 'Aadhaar_Document.jpg'} (${w.experienceHi || '5 साल अनुभव'})</span>
+          <!-- Document / KYC Details & Permanent Address from CV/OCR -->
+          <div class="p-3 bg-slate-950/90 rounded-xl border border-slate-800 flex flex-col gap-2 text-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🪪</span>
+                <div>
+                  <span class="text-slate-300 font-medium">आधार नंबर: <strong class="text-amber-300 font-mono">${w.aadhaarNumber || 'जांच हेतु संलग्न'}</strong></span>
+                  <span class="text-[10px] text-slate-400 block">दस्तावेज: ${w.aadhaarDocName || 'Aadhaar_Document.jpg'}</span>
+                </div>
               </div>
+              <button onclick='window.viewAadhaarPhoto(${JSON.stringify(w).replace(/'/g, "&apos;")})' class="px-3 py-1 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
+                <span>🔍</span>
+                <span>आधार कार्ड फोटो देखें</span>
+              </button>
             </div>
-            <span class="px-2.5 py-1 rounded bg-slate-800 text-[10px] text-slate-300 font-semibold shrink-0">
-              प्रस्तुत: ${w.registeredAt ? new Date(w.registeredAt).toLocaleDateString('hi-IN') : 'आज'}
-            </span>
+
+            <div class="pt-2 border-t border-slate-800/80 text-[11px] leading-relaxed">
+              <span class="text-slate-400 block font-semibold">🏠 मूल स्थायी पता (CV / OCR द्वारा पढ़ा गया):</span>
+              <span class="text-amber-200 font-medium">${w.permanentAddress || 'आधार अनुसार स्थायी पता'}</span>
+            </div>
           </div>
 
           <!-- Approve & Reject Action Buttons -->
           <div class="flex items-center gap-2 pt-1">
             <button onclick="approveWorkerCard('${w.id}')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-1.5">
               <span>✅</span>
-              <span>सत्यापित व स्वीकृत करें (Approve)</span>
+              <span>स्वीकृत करें व Worker ID जारी करें</span>
             </button>
             <button onclick="openRejectModal('${w.id}', '${w.name.replace(/'/g, "\\'")}')" class="py-2.5 px-4 bg-rose-500/20 hover:bg-rose-600 hover:text-white text-rose-300 border border-rose-500/40 active:scale-95 font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
               <span>❌</span>
-              <span>अस्वीकार करें (Reject)</span>
+              <span>अस्वीकार करें</span>
             </button>
           </div>
         </div>
       `).join('');
     }
 
+    // Modal view for Aadhaar Card photo
+    window.viewAadhaarPhoto = function(worker) {
+      const modal = document.getElementById('modal-view-aadhaar');
+      const img = document.getElementById('modal-aadhaar-img');
+      const nameSpan = document.getElementById('modal-aadhaar-worker-name');
+      const uidSpan = document.getElementById('modal-aadhaar-uid');
+      const permSpan = document.getElementById('modal-aadhaar-perm');
+      const locSpan = document.getElementById('modal-aadhaar-loc');
+
+      if (nameSpan) nameSpan.textContent = worker.name || '--';
+      if (uidSpan) uidSpan.textContent = worker.aadhaarNumber || 'जांच हेतु संलग्न';
+      if (permSpan) permSpan.textContent = worker.permanentAddress || 'आधार कार्ड अनुसार';
+      if (locSpan) locSpan.textContent = worker.localAddress || worker.townOrVillage || 'अम्बाला';
+      if (img) img.src = worker.aadhaarPhoto || 'assets/app-icon.png';
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    };
+
+    window.closeAadhaarModal = function() {
+      const modal = document.getElementById('modal-view-aadhaar');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    };
+
     // --- APPROVE WORKER ACTION ---
     window.approveWorkerCard = function(workerId) {
       if (!window.AMBALA_DATA || !window.AMBALA_DATA.approveWorker) return;
       const approvedWorker = window.AMBALA_DATA.approveWorker(workerId);
       if (approvedWorker) {
-        showAdminToast(`✅ ${approvedWorker.name} को सफलतापूर्वक स्वीकृत कर दिया गया! प्रोफाइल लाइव है।`);
+        showAdminToast(`🎉 ${approvedWorker.name} स्वीकृत! आधिकारिक Worker ID: ${approvedWorker.id} जारी कर दी गई है!`);
         renderPendingWorkers();
         renderApprovedWorkers();
         renderRejectedWorkers();
@@ -918,7 +985,7 @@
             const statusBox = document.getElementById('gh-sync-status');
             if (statusBox) {
               statusBox.classList.remove('hidden');
-              statusBox.innerHTML = '<span class="text-amber-400">⏳ 3 फाइल्स GitHub पर अपलोड हो रही हैं... (workers.json, jobs.json, localities.json)</span>';
+              statusBox.innerHTML = '<span class="text-amber-400">⏳ सभी 7 डेटाबेस फाइल्स GitHub पर अपलोड हो रही हैं...</span>';
             }
             ghPushBtn.textContent = '⏳ अपलोड हो रहा है...';
 
