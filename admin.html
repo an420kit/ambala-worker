@@ -147,57 +147,51 @@
     <!-- ========================================================================
          TAB 1: WORKER KYC APPROVALS
          ======================================================================== -->
+    <!-- ========================================================================
+         TAB 1: WORKER KYC APPROVALS & REJECTIONS (DYNAMIC)
+         ======================================================================== -->
     <section id="tab-approvals" class="admin-tab-content flex flex-col gap-3">
+      <!-- Pending Approvals Box -->
       <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
         <div class="flex items-center justify-between mb-3 border-b border-slate-700 pb-2.5">
           <div class="flex items-center gap-2">
-            <span class="text-amber-400 font-bold text-sm">पेंडिंग सत्यापन (Pending Approvals)</span>
-            <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">1 नया अनुरोध</span>
+            <span class="text-amber-400 font-bold text-sm">पेंडिंग सत्यापन (Pending KYC Approvals)</span>
+            <span id="badge-pending-count" class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold">1 नया अनुरोध</span>
           </div>
-          <span class="text-xs text-slate-400">KYC डॉक्यूमेंट्स चेक करें</span>
+          <span class="text-xs text-slate-400">KYC डॉक्यूमेंट्स चेक कर स्वीकृत/अस्वीकृत करें</span>
         </div>
 
-        <!-- Pending Card -->
-        <div id="admin-pending-card" class="bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="flex items-start gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center text-xl font-black shrink-0">
-              V
-            </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <h4 class="text-sm font-bold text-white">Vikram Mistri</h4>
-                <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">टाइल व फर्श मिस्त्री</span>
-              </div>
-              <p class="text-xs text-slate-400 mt-0.5">📍 गांव पंजोखरा साहिब • 📞 9812345099</p>
-              <p class="text-xs text-emerald-400 mt-1 font-mono">दरें: ₹160/घंटा • ₹900/दिन • ₹5,400/हफ्ता • ₹23,000/माह</p>
-              <div class="flex items-center gap-2 mt-2">
-                <span class="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">📄 आधार कार्ड सत्यापित</span>
-                <span class="text-[10px] text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">📸 फोटो अपलोड</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex sm:flex-col gap-2 shrink-0">
-            <button id="btn-approve-vikram" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1 active:scale-95" type="button">
-              <span class="material-symbols-outlined text-[16px]">check_circle</span>
-              <span>स्वीकृत करें (Approve)</span>
-            </button>
-            <button id="btn-reject-vikram" class="flex-1 px-4 py-2 bg-slate-800 hover:bg-rose-900/40 text-slate-300 hover:text-rose-300 rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center justify-center gap-1" type="button">
-              <span class="material-symbols-outlined text-[16px]">cancel</span>
-              <span>अस्वीकृत</span>
-            </button>
-          </div>
+        <!-- Dynamic Pending Workers Container -->
+        <div id="admin-pending-workers-container" class="flex flex-col gap-3">
+          <!-- Populated by renderPendingWorkers() -->
         </div>
       </div>
 
       <!-- Approved Active Workers List with VIP Toggle -->
       <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-bold text-white">सक्रिय सत्यापित कामगार (14 Active Workers)</h3>
+        <div class="flex items-center justify-between mb-3 border-b border-slate-700 pb-2.5">
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-bold text-white">सक्रिय सत्यापित कामगार (Active Live Workers)</h3>
+            <span id="badge-approved-count" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">14 सक्रिय</span>
+          </div>
           <span class="text-xs text-slate-400">VIP बैज से ऐप में टॉप पर दिखाएं</span>
         </div>
-        <div class="flex flex-col gap-2.5" id="admin-approved-workers-list">
-          <!-- Populated by JS -->
+        <div class="flex flex-col gap-2.5 max-h-[420px] overflow-y-auto pr-1" id="admin-approved-workers-list">
+          <!-- Populated by renderApprovedWorkers() -->
+        </div>
+      </div>
+
+      <!-- Rejected Workers Archive -->
+      <div class="bg-slate-800/80 p-4 rounded-3xl border border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-700 pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-rose-400 font-bold text-sm">अस्वीकृत कामगार (Rejected Archive)</span>
+            <span id="badge-rejected-count" class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold">0</span>
+          </div>
+          <span class="text-xs text-slate-400">अस्वीकृति का कारण देखें व आवश्यकता पड़ने पर पुनः सक्रिय करें</span>
+        </div>
+        <div id="admin-rejected-workers-container" class="flex flex-col gap-2">
+          <!-- Populated by renderRejectedWorkers() -->
         </div>
       </div>
     </section>
@@ -390,6 +384,48 @@
 
   </main>
 
+  <!-- Modal: Reject Worker KYC -->
+  <div id="modal-reject-worker" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚠️</span>
+          <h3 class="text-sm font-bold text-white">कामगार आवेदन अस्वीकृत करें (Reject KYC)</h3>
+        </div>
+        <button id="btn-close-reject-modal" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs">✕</button>
+      </div>
+
+      <div>
+        <p class="text-xs text-slate-300">कामगार: <span id="reject-worker-target-name" class="font-bold text-amber-300">--</span></p>
+        <p class="text-[11px] text-slate-400 mt-0.5">कृपया अस्वीकृति का कारण चुनें ताकि रिकॉर्ड सुरक्षित रहे और कामगार को सूचित किया जा सके:</p>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-[11px] font-bold text-slate-300" for="select-reject-reason">अस्वीकृति का प्राथमिक कारण</label>
+        <select id="select-reject-reason" class="px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-rose-500">
+          <option value="अधूरे या धुंधले आधार/KYC दस्तावेज (Blurry or incomplete docs)">अधूरे या धुंधले आधार/KYC दस्तावेज</option>
+          <option value="अमान्य या बंद मोबाइल नंबर (Unreachable mobile number)">अमान्य या बंद मोबाइल नंबर</option>
+          <option value="अस्पष्ट कार्य अनुभव या गलत विवरण (Unclear experience or false info)">अस्पष्ट कार्य अनुभव या गलत विवरण</option>
+          <option value="अम्बाला कार्यक्षेत्र से बाहर (Out of Ambala jurisdiction)">अम्बाला कार्यक्षेत्र से बाहर</option>
+          <option value="custom">अन्य विशेष कारण (नीचे लिखें)...</option>
+        </select>
+      </div>
+
+      <div id="box-custom-reject-reason" class="hidden flex flex-col gap-1">
+        <label class="text-[11px] font-bold text-slate-300" for="input-custom-reject-reason">विस्तृत कारण लिखें</label>
+        <textarea id="input-custom-reject-reason" rows="2" class="px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-rose-500 placeholder:text-slate-500" placeholder="कारण स्पष्ट करें..."></textarea>
+      </div>
+
+      <div class="flex items-center gap-2 pt-2 border-t border-slate-800">
+        <button id="btn-cancel-reject-modal" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-all">रद्द करें</button>
+        <button id="btn-confirm-reject-worker" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
+          <span>❌</span>
+          <span>अस्वीकृत करें</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Notification Toast -->
   <div id="admin-toast" class="fixed bottom-5 right-5 z-[9999] bg-emerald-500 text-slate-950 px-4 py-2.5 rounded-2xl font-bold text-xs shadow-2xl transition-all duration-300 opacity-0 pointer-events-none translate-y-3 flex items-center gap-2">
     <span class="material-symbols-outlined text-[18px]">check_circle</span>
@@ -407,6 +443,9 @@
       });
     }
 
+    // Current worker selected for rejection
+    let currentRejectWorkerId = null;
+
     // --- TOAST HELPER ---
     function showAdminToast(msg) {
       const toast = document.getElementById('admin-toast');
@@ -419,6 +458,37 @@
         toast.classList.remove('opacity-100', 'translate-y-0');
         toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
       }, 3000);
+    }
+
+    // --- UPDATE ADMIN STAT COUNTERS ---
+    function updateAdminStats() {
+      const pending = window.AMBALA_DATA ? window.AMBALA_DATA.getPendingWorkers() : [];
+      const approved = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredWorkers() : [];
+      const rejected = window.AMBALA_DATA ? window.AMBALA_DATA.getRejectedWorkers() : [];
+      const jobs = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredJobs() : [];
+      const locs = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredLocalities() : [];
+
+      if (document.getElementById('stat-total-workers')) {
+        document.getElementById('stat-total-workers').textContent = approved.length;
+      }
+      if (document.getElementById('stat-pending-kyc')) {
+        document.getElementById('stat-pending-kyc').textContent = pending.length;
+      }
+      if (document.getElementById('stat-total-jobs')) {
+        document.getElementById('stat-total-jobs').textContent = jobs.length;
+      }
+      if (document.getElementById('stat-total-locations')) {
+        document.getElementById('stat-total-locations').textContent = locs.length + '+';
+      }
+      if (document.getElementById('badge-pending-count')) {
+        document.getElementById('badge-pending-count').textContent = `${pending.length} नया अनुरोध`;
+      }
+      if (document.getElementById('badge-approved-count')) {
+        document.getElementById('badge-approved-count').textContent = `${approved.length} सक्रिय`;
+      }
+      if (document.getElementById('badge-rejected-count')) {
+        document.getElementById('badge-rejected-count').textContent = `${rejected.length} अस्वीकृत`;
+      }
     }
 
     // --- TAB SWITCHER ---
@@ -444,11 +514,209 @@
       window.location.href = 'index.html';
     });
 
+    // --- POPULATE PENDING WORKERS ---
+    function renderPendingWorkers() {
+      const container = document.getElementById('admin-pending-workers-container');
+      if (!container) return;
+      const pending = window.AMBALA_DATA ? window.AMBALA_DATA.getPendingWorkers() : [];
+
+      if (pending.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-slate-400 bg-slate-900/40 rounded-2xl border border-dashed border-slate-700/60">
+            <span class="text-3xl block mb-2">🎉</span>
+            <span class="text-xs font-bold text-slate-200 block">सभी आवेदन स्वीकृत या निपटाए जा चुके हैं!</span>
+            <span class="text-[11px] text-slate-400 mt-0.5 block">सत्यापन हेतु कोई नया कामगार लंबित नहीं है।</span>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = pending.map(w => `
+        <div id="pending-card-${w.id}" class="bg-slate-900/80 p-4 rounded-2xl border border-amber-500/30 flex flex-col gap-3 transition-all">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+            <div class="flex items-center gap-3">
+              <img src="${w.avatar || 'assets/worker_rajesh.jpg'}" class="w-12 h-12 rounded-xl object-cover border border-amber-500/40" alt="${w.name}"/>
+              <div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h4 class="font-bold text-white text-sm">${w.name}</h4>
+                  <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">पेंडिंग KYC</span>
+                  <span class="text-xs text-slate-400">(${w.roleHi || w.roleEn || 'कारीगर'})</span>
+                </div>
+                <p class="text-xs text-slate-300 mt-0.5">
+                  📍 <span class="text-amber-200 font-semibold">${w.townOrVillage || 'अम्बाला'}</span> • 
+                  📞 <a href="tel:${w.phone}" class="text-cyan-300 hover:underline font-mono">${w.phone}</a>
+                </p>
+              </div>
+            </div>
+            <div class="text-left sm:text-right bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 block">मांगी गई दरें:</span>
+              <span class="text-xs font-bold text-amber-300">₹${w.dailyRate || 800}/दिन • ₹${w.hourlyRate || 150}/घंटा</span>
+            </div>
+          </div>
+
+          <!-- Document / KYC Details -->
+          <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🪪</span>
+              <div>
+                <span class="text-slate-300 font-medium">आधार नंबर: <strong class="text-white font-mono">${w.aadhaarNumber || 'जांच हेतु संलग्न'}</strong></span>
+                <span class="text-[10px] text-slate-400 block">दस्तावेज: ${w.aadhaarDocName || 'Aadhaar_Document.jpg'} (${w.experienceHi || '5 साल अनुभव'})</span>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-slate-800 text-[10px] text-slate-300 font-semibold shrink-0">
+              प्रस्तुत: ${w.registeredAt ? new Date(w.registeredAt).toLocaleDateString('hi-IN') : 'आज'}
+            </span>
+          </div>
+
+          <!-- Approve & Reject Action Buttons -->
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="approveWorkerCard('${w.id}')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-1.5">
+              <span>✅</span>
+              <span>सत्यापित व स्वीकृत करें (Approve)</span>
+            </button>
+            <button onclick="openRejectModal('${w.id}', '${w.name.replace(/'/g, "\\'")}')" class="py-2.5 px-4 bg-rose-500/20 hover:bg-rose-600 hover:text-white text-rose-300 border border-rose-500/40 active:scale-95 font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
+              <span>❌</span>
+              <span>अस्वीकार करें (Reject)</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- APPROVE WORKER ACTION ---
+    window.approveWorkerCard = function(workerId) {
+      if (!window.AMBALA_DATA || !window.AMBALA_DATA.approveWorker) return;
+      const approvedWorker = window.AMBALA_DATA.approveWorker(workerId);
+      if (approvedWorker) {
+        showAdminToast(`✅ ${approvedWorker.name} को सफलतापूर्वक स्वीकृत कर दिया गया! प्रोफाइल लाइव है।`);
+        renderPendingWorkers();
+        renderApprovedWorkers();
+        renderRejectedWorkers();
+        updateAdminStats();
+      }
+    };
+
+    // --- REJECT WORKER MODAL & ACTION ---
+    window.openRejectModal = function(workerId, workerName) {
+      currentRejectWorkerId = workerId;
+      const modal = document.getElementById('modal-reject-worker');
+      const targetName = document.getElementById('reject-worker-target-name');
+      const reasonSelect = document.getElementById('select-reject-reason');
+      const customBox = document.getElementById('box-custom-reject-reason');
+      const customInput = document.getElementById('input-custom-reject-reason');
+
+      if (targetName) targetName.textContent = workerName;
+      if (reasonSelect) reasonSelect.value = "अधूरे या धुंधले आधार/KYC दस्तावेज (Blurry or incomplete docs)";
+      if (customBox) customBox.classList.add('hidden');
+      if (customInput) customInput.value = '';
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    };
+
+    function closeRejectModal() {
+      const modal = document.getElementById('modal-reject-worker');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      currentRejectWorkerId = null;
+    }
+
+    document.getElementById('btn-close-reject-modal')?.addEventListener('click', closeRejectModal);
+    document.getElementById('btn-cancel-reject-modal')?.addEventListener('click', closeRejectModal);
+
+    // Toggle custom reason box
+    document.getElementById('select-reject-reason')?.addEventListener('change', (e) => {
+      const customBox = document.getElementById('box-custom-reject-reason');
+      if (customBox) {
+        if (e.target.value === 'custom') {
+          customBox.classList.remove('hidden');
+        } else {
+          customBox.classList.add('hidden');
+        }
+      }
+    });
+
+    // Confirm Rejection Button
+    document.getElementById('btn-confirm-reject-worker')?.addEventListener('click', () => {
+      if (!currentRejectWorkerId || !window.AMBALA_DATA || !window.AMBALA_DATA.rejectWorker) return;
+
+      const reasonSelect = document.getElementById('select-reject-reason');
+      const customInput = document.getElementById('input-custom-reject-reason');
+      let reason = reasonSelect.value;
+      if (reason === 'custom') {
+        reason = customInput.value.trim() || 'प्रशासनिक कारणों से अस्वीकृत (Administrative decision)';
+      }
+
+      const rejectedWorker = window.AMBALA_DATA.rejectWorker(currentRejectWorkerId, reason);
+      closeRejectModal();
+
+      if (rejectedWorker) {
+        showAdminToast(`❌ ${rejectedWorker.name} का आवेदन अस्वीकृत कर दिया गया।`);
+        renderPendingWorkers();
+        renderApprovedWorkers();
+        renderRejectedWorkers();
+        updateAdminStats();
+      }
+    });
+
+    // --- POPULATE REJECTED WORKERS ---
+    function renderRejectedWorkers() {
+      const container = document.getElementById('admin-rejected-workers-container');
+      if (!container) return;
+      const rejected = window.AMBALA_DATA ? window.AMBALA_DATA.getRejectedWorkers() : [];
+
+      if (rejected.length === 0) {
+        container.innerHTML = `
+          <div class="p-3 text-center text-slate-500 text-xs bg-slate-900/30 rounded-2xl border border-slate-800">
+            वर्तमान में कोई अस्वीकृत कामगार नहीं है।
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = rejected.map(w => `
+        <div class="bg-slate-900/70 p-3 rounded-2xl border border-rose-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center font-bold">✕</div>
+            <div>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-white">${w.name}</span>
+                <span class="text-slate-400 text-[11px]">(${w.roleHi || w.roleEn || 'कारीगर'})</span>
+                <span class="text-[10px] text-slate-400 font-mono">📞 ${w.phone}</span>
+              </div>
+              <div class="mt-1 flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-semibold">कारण: ${w.rejectionReason || 'दस्तावेज त्रुटि'}</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="restoreWorkerCard('${w.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white border border-slate-700 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1 shrink-0">
+            <span>🔄</span>
+            <span>पुनः समीक्षा में भेजें</span>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Restore rejected worker back to pending
+    window.restoreWorkerCard = function(workerId) {
+      if (!window.AMBALA_DATA || !window.AMBALA_DATA.restoreWorker) return;
+      const worker = window.AMBALA_DATA.restoreWorker(workerId);
+      if (worker) {
+        showAdminToast(`🔄 ${worker.name} को पुनः पेंडिंग सत्यापन में भेज दिया गया!`);
+        renderPendingWorkers();
+        renderApprovedWorkers();
+        renderRejectedWorkers();
+        updateAdminStats();
+      }
+    };
+
     // --- POPULATE APPROVED WORKERS WITH VIP BOOST ---
     function renderApprovedWorkers() {
       const list = document.getElementById('admin-approved-workers-list');
       if (!list) return;
-      const workers = window.AMBALA_DATA ? window.AMBALA_DATA.workers : [];
+      const workers = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredWorkers() : [];
       list.innerHTML = workers.map(w => `
         <div class="bg-slate-900/70 p-3 rounded-2xl border border-slate-700/60 flex items-center justify-between text-xs">
           <div class="flex items-center gap-3">
@@ -528,29 +796,15 @@
       `).join('');
     }
 
-    // --- EVENT LISTENERS ---
+    // --- INITIALIZE ON DOM LOAD ---
     document.addEventListener('DOMContentLoaded', () => {
+      renderPendingWorkers();
       renderApprovedWorkers();
+      renderRejectedWorkers();
       renderLocations();
       renderTrades();
       renderAds();
-
-      // Approve Vikram
-      const approveBtn = document.getElementById('btn-approve-vikram');
-      if (approveBtn) {
-        approveBtn.addEventListener('click', () => {
-          const card = document.getElementById('admin-pending-card');
-          if (card) {
-            card.innerHTML = `<div class="p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-emerald-300 font-bold text-xs flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px]">check_circle</span>
-              <span>Vikram Mistri सफलतापूर्वक स्वीकृत हो गए! प्रोफाइल तुरंत लाइव कर दी गई है।</span>
-            </div>`;
-          }
-          document.getElementById('stat-pending-kyc').textContent = '0';
-          document.getElementById('stat-total-workers').textContent = '15';
-          showAdminToast('Vikram Mistri स्वीकृत हो गए!');
-        });
-      }
+      updateAdminStats();
 
       // Add Location
       const addLocBtn = document.getElementById('btn-add-location');
