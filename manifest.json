@@ -1,0 +1,31 @@
+{
+  "name": "Ambala Worker (अम्बाला वर्कर)",
+  "short_name": "Ambala Worker",
+  "description": "Ambala's dedicated local labor & worker network for 1-day daily wage to monthly jobs.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8f9ff",
+  "theme_color": "#00236f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "lifestyle", "business"]
+}

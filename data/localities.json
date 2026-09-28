@@ -1,0 +1,15 @@
+[
+  { "id": "cantt_sadar", "nameHi": "सदर बाजार", "type": "town", "zone": "Ambala Cantt" },
+  { "id": "cantt_mahesh", "nameHi": "महेश नगर", "type": "colony", "zone": "Ambala Cantt" },
+  { "id": "cantt_babyal", "nameHi": "गांव बब्याल", "type": "village", "zone": "Ambala Cantt" },
+  { "id": "cantt_boh", "nameHi": "गांव बोह", "type": "village", "zone": "Ambala Cantt" },
+  { "id": "cantt_panjokhra", "nameHi": "गांव पंजोखरा साहिब", "type": "village", "zone": "Ambala Cantt" },
+  { "id": "city_model_town", "nameHi": "मॉडल टाउन", "type": "town", "zone": "Ambala City" },
+  { "id": "city_sector7", "nameHi": "सेक्टर 7", "type": "sector", "zone": "Ambala City" },
+  { "id": "city_baldev", "nameHi": "बलदेव नगर", "type": "colony", "zone": "Ambala City" },
+  { "id": "belt_barara", "nameHi": "कस्बा बराड़ा", "type": "town", "zone": "Barara" },
+  { "id": "belt_saha", "nameHi": "कस्बा साहा", "type": "town", "zone": "Saha" },
+  { "id": "belt_mullana", "nameHi": "कस्बा मुलाना", "type": "town", "zone": "Mullana" },
+  { "id": "belt_naraingarh", "nameHi": "कस्बा नारायणगढ़", "type": "town", "zone": "Naraingarh" },
+  { "id": "belt_shahzadpur", "nameHi": "कस्बा शहजादपुर", "type": "town", "zone": "Shahzadpur" }
+]

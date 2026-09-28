@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="hi" class="h-full">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>अम्बाला वर्कर - सुरक्षित पोर्टल (Ambala Worker Portal)</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta name="description" content="अम्बाला कैंट, सिटी व ग्रामीण क्षेत्र का आधिकारिक सुरक्षित पोर्टल। कारीगर, लेबर व ग्राहक सेवा मंच।"/>
+  
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#080C14"/>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg"/>
+  <script src="js/security-guard.js"></script>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..500,0..1,0" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#080C14',
+              card: '#0D1424',
+              border: '#1E293B',
+              primary: '#10B981',
+              accent: '#F59E0B'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <!-- Computer Vision & Aadhaar OCR -->
+  <script src="js/aadhaar-ocr.js?v=3.2"></script>
+  <style>
+    @keyframes laserSweep {
+      0% { top: 0%; opacity: 0.8; }
+      50% { top: 90%; opacity: 1; }
+      100% { top: 0%; opacity: 0.8; }
+    }
+    .scan-laser-beam {
+      animation: laserSweep 1.8s ease-in-out infinite;
+    }
+    /* Subtle background grid pattern */
+    .bg-mesh-pattern {
+      background-color: #080C14;
+      background-image: 
+        radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.06) 0px, transparent 50%);
+    }
+  </style>
+  <link rel="stylesheet" href="css/style.css?v=3.1"/>
+</head>
+<body class="bg-mesh-pattern text-slate-100 font-sans antialiased min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 pb-20 selection:bg-emerald-500 selection:text-slate-950">
+
+  <!-- ==========================================================================
+       MAIN PORTAL WRAPPER
+       ========================================================================== -->
+  <div class="w-full max-w-md flex flex-col items-center">
+
+    <!-- Top Brand Header -->
+    <header class="text-center flex flex-col items-center mb-5">
+      <div class="relative mb-3 group">
+        <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black text-3xl shadow-xl shadow-emerald-500/20 ring-1 ring-white/20 transition-transform duration-300 group-hover:scale-105">
+          AW
+        </div>
+        <span class="absolute -bottom-1 -right-1 w-7 h-7 bg-slate-900 text-emerald-400 rounded-full border border-emerald-500/40 flex items-center justify-center text-xs shadow-md">
+          🛡️
+        </span>
+      </div>
+
+      <div class="flex items-center justify-center gap-2">
+        <h1 class="text-2xl font-black tracking-tight text-white">अम्बाला वर्कर</h1>
+        <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-bold border border-emerald-500/30">सुरक्षित पोर्टल</span>
+      </div>
+      <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
+        अम्बाला कैंट, सिटी व ग्रामीण क्षेत्र का आधिकारिक डिजिटल सेवा मंच
+      </p>
+    </header>
+
+    <!-- Main Navigation Mode Switcher (Pills) -->
+    <nav aria-label="Portal Navigation" class="w-full bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 mb-3.5 flex gap-1 text-xs font-bold shadow-lg shadow-black/30 backdrop-blur-md">
+      <button id="main-tab-login" type="button" class="flex-1 py-2.5 px-2 rounded-xl bg-emerald-600 text-white transition-all text-center flex items-center justify-center gap-1.5 shadow-sm">
+        <span class="material-symbols-outlined text-[16px]">lock</span>
+        <span>लॉगिन</span>
+      </button>
+      <button id="main-tab-customer" type="button" class="flex-1 py-2.5 px-2 rounded-xl text-slate-400 hover:text-white transition-all text-center flex items-center justify-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px]">person_add</span>
+        <span>नया ग्राहक</span>
+      </button>
+      <button id="main-tab-worker" type="button" class="flex-1 py-2.5 px-2 rounded-xl text-slate-400 hover:text-white transition-all text-center flex items-center justify-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px]">badge</span>
+        <span>कामगार KYC</span>
+      </button>
+    </nav>
+
+    <!-- Main Card Body -->
+    <main class="w-full bg-slate-900/80 rounded-3xl p-5 sm:p-6 border border-slate-800/90 shadow-2xl backdrop-blur-xl">
+      
+      <!-- ==========================================
+           TAB 1: SECURE LOGIN CONTAINER
+           ========================================== -->
+      <section id="section-login-container">
+        <!-- DIRECT SECURE LOGIN FORM (NO OTP REQUIRED) -->
+        <div id="section-pass-login">
+          <div class="mb-3.5 pb-2.5 border-b border-slate-800/80 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">आधिकारिक सुरक्षित लॉगिन</span>
+              <h2 class="text-xs font-bold text-white">आईडी / मोबाइल नंबर व पासवर्ड से सीधा प्रवेश</h2>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">✓ सीधा लॉगिन</span>
+          </div>
+
+          <form id="login-form" class="flex flex-col gap-3.5" onsubmit="event.preventDefault(); handleLoginSubmit();">
+            <!-- User ID / Phone -->
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-bold text-slate-300 flex items-center justify-between" for="input-login-id">
+                <span>यूजर ID या मोबाइल नंबर *</span>
+                <span class="text-[10px] text-slate-500 font-normal">एडमिन / कामगार / ग्राहक</span>
+              </label>
+              <div class="relative flex items-center bg-slate-950/90 border border-slate-800 rounded-2xl px-3.5 py-3 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+                <span class="material-symbols-outlined text-slate-400 text-[18px] mr-2.5">person</span>
+                <input id="input-login-id" type="text" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-medium" placeholder="ID या 10-अंकों का मोबाइल नंबर (उदा. 9812345000)" autocomplete="username" required />
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-bold text-slate-300 flex items-center justify-between" for="input-login-pass">
+                <span>पासवर्ड (Password) *</span>
+                <span class="text-[10px] text-slate-500 font-normal">सुरक्षित पासवर्ड</span>
+              </label>
+              <div class="relative flex items-center bg-slate-950/90 border border-slate-800 rounded-2xl px-3.5 py-3 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+                <span class="material-symbols-outlined text-slate-400 text-[18px] mr-2.5">lock</span>
+                <input id="input-login-pass" type="password" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-medium" placeholder="पासवर्ड दर्ज करें" autocomplete="current-password" required />
+                <button id="btn-toggle-pass" type="button" class="text-slate-400 hover:text-white px-1 text-xs transition-colors" title="पासवर्ड देखें/छिपाएं">
+                  <span class="material-symbols-outlined text-[18px]" id="icon-pass-toggle">visibility</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="login-error-box" class="hidden p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-xs text-rose-300 flex items-start gap-2.5 leading-relaxed">
+              <span class="material-symbols-outlined text-rose-400 text-[18px] shrink-0 mt-0.5">error</span>
+              <span id="login-error-text" class="flex-1 font-medium">अमान्य आईडी या पासवर्ड! कृपया दोबारा जांचें।</span>
+            </div>
+
+            <!-- Submit Button -->
+            <button id="btn-submit-login" type="submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all text-xs flex items-center justify-center gap-2 mt-1">
+              <span>सीधा सुरक्षित लॉगिन करें (Sign In)</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </button>
+
+            <!-- Quick Demo 1-Click Fill Helpers -->
+            <div class="pt-2 border-t border-slate-800/80 flex flex-col gap-1.5">
+              <span class="text-[10px] text-slate-400 font-semibold">त्वरित डेमो टेस्ट लॉगिन (1-क्लिक भरें):</span>
+              <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+                <button type="button" onclick="quickFillLogin('an420kit', 'Ab@25262728')" class="p-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-slate-300 hover:text-white transition-all text-center">
+                  👑 एडमिन
+                </button>
+                <button type="button" onclick="quickFillLogin('9812345004', '9812345004')" class="p-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-slate-300 hover:text-white transition-all text-center">
+                  👷 कामगार
+                </button>
+                <button type="button" onclick="quickFillLogin('9812345000', '9812345000')" class="p-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-slate-300 hover:text-white transition-all text-center">
+                  🛒 ग्राहक
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: NEW CUSTOMER REGISTRATION
+           ========================================== -->
+      <section id="section-cust-register" class="hidden flex flex-col gap-3.5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-400">नया ग्राहक खाता</span>
+            <h2 class="text-sm font-bold text-white">ग्राहक पंजीकरण फॉर्म</h2>
+          </div>
+          <span class="text-2xl">👤</span>
+        </div>
+
+        <p class="text-[11px] text-slate-300 leading-relaxed bg-blue-950/40 p-2.5 rounded-xl border border-blue-500/30">
+          अम्बाला में मिस्त्री, बाई व लेबर सेवाएं बुक करने के लिए अपना सुरक्षित ग्राहक खाता बनाएं।
+        </p>
+
+        <form id="form-customer-signup" class="flex flex-col gap-3" onsubmit="event.preventDefault(); handleCustomerSignUp();">
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300" for="cust-reg-name">आपका पूरा नाम *</label>
+            <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 focus-within:border-blue-500 transition-all">
+              <span class="text-slate-400 mr-2 text-xs">👤</span>
+              <input id="cust-reg-name" type="text" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-semibold" placeholder="उदा. विकास कुमार / सीमा शर्मा" required />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300" for="cust-reg-phone">मोबाइल नंबर (10 अंक) *</label>
+            <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 focus-within:border-blue-500 transition-all">
+              <span class="text-xs font-bold text-blue-400 mr-2">+91</span>
+              <input id="cust-reg-phone" type="tel" maxlength="10" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-bold" placeholder="9812345678" required />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300" for="cust-reg-locality">अम्बाला में आपका इलाका / कॉलोनी *</label>
+            <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 focus-within:border-blue-500 transition-all">
+              <span class="text-slate-400 mr-2 text-xs">📍</span>
+              <input id="cust-reg-locality" type="text" list="index-localities-list" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none" placeholder="उदा. मॉडल टाउन, महेश नगर, सेक्टर 7, साहा..." required />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300" for="cust-reg-pass">पासवर्ड बनाएं (कम से कम 4 अक्षर) *</label>
+            <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 focus-within:border-blue-500 transition-all">
+              <span class="text-slate-400 mr-2 text-xs">🔒</span>
+              <input id="cust-reg-pass" type="password" class="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none font-semibold" placeholder="अपना गुप्त पासवर्ड दर्ज करें" required />
+              <button type="button" onclick="toggleCustPassVisibility()" class="text-slate-400 hover:text-white px-1 text-xs">
+                <span class="material-symbols-outlined text-[16px]" id="cust-pass-icon">visibility</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="cust-signup-msg" class="hidden p-3 rounded-2xl text-xs font-semibold"></div>
+
+          <button id="btn-submit-cust-reg" type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-xs shadow-lg shadow-blue-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 mt-1">
+            <span>खाता बनाएं व ग्राहक पोर्टल खोलें ➔</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: NEW WORKER KYC REGISTRATION
+           ========================================== -->
+      <section id="section-worker-register" class="hidden flex flex-col gap-3.5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">कामगार पंजीकरण (Worker KYC)</span>
+            <h2 class="text-sm font-bold text-white">कारीगर / लेबर पंजीकरण फॉर्म</h2>
+          </div>
+          <span class="text-2xl">👷</span>
+        </div>
+
+        <p class="text-[11px] text-slate-300 leading-relaxed bg-amber-950/30 p-2.5 rounded-xl border border-amber-500/30">
+          ⚡ <strong>अनिवार्य आधार सत्यापन:</strong> आधार कार्ड की फोटो अपलोड करें। हमारा <strong>Computer Vision / OCR</strong> स्वतः आपका नाम, आधार नंबर और मूल स्थायी पता दर्ज करेगा। आधिकारिक वर्कर ID <strong>एडमिन सत्यापन के बाद</strong> ही सक्रिय होगी।
+        </p>
+
+        <form id="form-worker-kyc-signup" class="flex flex-col gap-3.5" onsubmit="event.preventDefault(); handleWorkerSignUp();">
+          
+          <!-- MANDATORY AADHAAR CARD PHOTO WITH COMPUTER VISION / OCR -->
+          <div class="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-amber-950/20 border-2 border-dashed border-amber-500/40">
+            <div class="flex items-center justify-between">
+              <label class="text-[11px] font-black text-amber-300 flex items-center gap-1.5" for="worker-reg-aadhaar-file">
+                <span>🪪 आधार कार्ड की फोटो (अनिवार्य) *</span>
+              </label>
+              <span class="text-[9px] text-amber-300 font-extrabold bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40">📷 CV विज़न स्कैन</span>
+            </div>
+            
+            <input id="worker-reg-aadhaar-file" type="file" accept="image/*" class="w-full text-xs text-slate-300 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer" required />
+            
+            <p class="text-[10px] text-slate-400">
+              फोटो चुनते ही AI विज़न स्वतः विवरण पढ़ेगा।
+            </p>
+
+            <!-- Computer Vision Scanning HUD -->
+            <div id="aadhaar-scanning-hud" class="hidden relative rounded-xl overflow-hidden border border-amber-500/40 bg-slate-950/90 p-2 mt-1">
+              <div class="relative w-full h-36 bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center">
+                <img id="aadhaar-preview-img" src="" class="w-full h-full object-contain" alt="Aadhaar Preview"/>
+                <!-- Neon laser beam line -->
+                <div id="aadhaar-laser-line" class="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent scan-laser-beam shadow-[0_0_12px_#22d3ee]"></div>
+              </div>
+              <div class="flex items-center justify-between mt-2 px-1 text-[11px]">
+                <span id="aadhaar-ocr-status" class="text-amber-300 font-bold flex items-center gap-1.5">
+                  <span class="animate-spin inline-block">🔄</span>
+                  <span>AI विज़न आधार कार्ड को पढ़ रहा है...</span>
+                </span>
+                <span id="aadhaar-ocr-pct" class="text-emerald-400 font-mono font-bold">50%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AUTO-EXTRACTED BY OCR: Name & Aadhaar Number -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-bold text-slate-300 flex items-center justify-between" for="worker-reg-name">
+                <span>कामगार का पूरा नाम *</span>
+                <span class="text-[9px] text-amber-400">OCR से स्वतः प्राप्त</span>
+              </label>
+              <input id="worker-reg-name" type="text" class="px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-semibold" placeholder="आधार अनुसार नाम" required />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-bold text-slate-300 flex items-center justify-between" for="worker-reg-aadhaar">
+                <span>आधार नंबर (12 अंक) *</span>
+                <span class="text-[9px] text-amber-400">OCR से स्वतः प्राप्त</span>
+              </label>
+              <input id="worker-reg-aadhaar" type="text" class="px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-mono font-bold" placeholder="XXXX XXXX XXXX" required />
+            </div>
+          </div>
+
+          <!-- AUTO-EXTRACTED BY OCR: Permanent Address -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300 flex items-center justify-between" for="worker-reg-permanent">
+              <span>मूल स्थायी पता (Permanent Address) *</span>
+              <span class="text-[9px] text-amber-400 font-bold">आधार से ऑटो-पिक</span>
+            </label>
+            <textarea id="worker-reg-permanent" rows="2" class="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-amber-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-400 leading-relaxed" placeholder="आधार कार्ड का मूल स्थायी पता" required></textarea>
+          </div>
+
+          <!-- MANUAL LOCAL ADDRESS IN AMBALA -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-slate-300 flex items-center justify-between" for="worker-reg-locality">
+              <span>अम्बाला में वर्तमान पता / गांव या कस्बा *</span>
+              <span class="text-[9px] text-slate-500 font-normal">मैन्युअल चुनें</span>
+            </label>
+            <input id="worker-reg-locality" type="text" list="index-localities-list" class="px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400" placeholder="उदा. पंजोखरा, बब्याल, सदर बाजार, साहा, मॉडल टाउन..." required />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-bold text-slate-300" for="worker-reg-phone">मोबाइल नंबर (10 अंक) *</label>
+              <input id="worker-reg-phone" type="tel" maxlength="10" class="px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-mono font-bold" placeholder="9812345001" required />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-bold text-slate-300" for="worker-reg-trade">काम / पेशा (Trade) *</label>
+              <input id="worker-reg-trade" type="text" list="index-trades-list" class="px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400" placeholder="उदा. प्लंबर, राज मिस्त्री, बाई..." required />
+            </div>
+          </div>
+
+          <!-- Rates -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-bold text-slate-300" for="worker-reg-daily">दैनिक मजदूरी (₹/दिन)</label>
+              <input id="worker-reg-daily" type="number" class="px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-amber-300 font-bold placeholder:text-slate-500 focus:outline-none focus:border-amber-400" placeholder="800" value="800" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-bold text-slate-300" for="worker-reg-hourly">घंटेवार दर (₹/घंटा)</label>
+              <input id="worker-reg-hourly" type="number" class="px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-amber-300 font-bold placeholder:text-slate-500 focus:outline-none focus:border-amber-400" placeholder="150" value="150" />
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-[10px] text-slate-400 leading-relaxed">
+            🛡️ <strong>सत्यापन प्रक्रिया:</strong> आवेदन जमा होने पर एडमिन द्वारा आधार व पते की पुष्टि के बाद ही आधिकारिक <strong>Worker ID</strong> जारी होगी।
+          </div>
+
+          <button id="btn-submit-worker-reg" type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-2xl text-xs shadow-lg shadow-amber-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 mt-1">
+            <span>📄 आधार KYC आवेदन सबमिट करें</span>
+            <span class="material-symbols-outlined text-[16px]">verified</span>
+          </button>
+        </form>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Switchers -->
+    <footer class="w-full mt-4 flex items-center justify-center gap-3 text-xs text-slate-400 text-center">
+      <span id="footer-helper-label">नया खाता बनाना है?</span>
+      <button type="button" onclick="switchMainTab('worker')" class="text-amber-400 hover:text-amber-300 font-bold hover:underline">
+        कामगार KYC
+      </button>
+      <span>•</span>
+      <button type="button" onclick="switchMainTab('customer')" class="text-blue-400 hover:text-blue-300 font-bold hover:underline">
+        नया ग्राहक
+      </button>
+    </footer>
+
+    <!-- PWA Install App Button -->
+    <div class="w-full mt-4 p-3 bg-slate-900/60 rounded-2xl border border-slate-800 flex items-center justify-between text-xs backdrop-blur-md">
+      <div class="flex items-center gap-2.5">
+        <span class="text-lg">📲</span>
+        <div>
+          <span class="font-bold text-white block">अम्बाला वर्कर ऐप इन्स्टॉल करें</span>
+          <span class="text-[10px] text-slate-400">Android APK की तरह होम स्क्रीन पर जोड़ें</span>
+        </div>
+      </div>
+      <button id="btn-install-pwa" type="button" class="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-all active:scale-95 shadow-sm">
+        + इन्स्टॉल
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Datalists for Autocomplete -->
+  <datalist id="index-localities-list"></datalist>
+  <datalist id="index-trades-list"></datalist>
+
+  <!-- Modal: Worker Registration Confirmation -->
+  <div id="modal-worker-reg-success" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-amber-500/40 w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col gap-3.5 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center text-3xl mx-auto">🎉</div>
+      <h3 class="text-base font-black text-white">आवेदन सफलतापूर्वक जमा हो गया!</h3>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        धन्यवाद <strong id="success-worker-name" class="text-amber-300">--</strong>! आपका आधार कार्ड और आवेदन <strong>पेंडिंग सत्यापन</strong> में दर्ज हो गया है।
+      </p>
+      <div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 text-left text-xs space-y-1.5">
+        <p class="text-slate-400">📍 स्थानीय पता: <span id="success-worker-loc" class="text-white font-semibold">--</span></p>
+        <p class="text-slate-400">🏠 स्थायी पता (आधार): <span id="success-worker-perm" class="text-amber-200 font-semibold">--</span></p>
+        <p class="text-slate-400">🛠️ पेशा: <span id="success-worker-trade" class="text-white font-semibold">--</span></p>
+        <p class="text-slate-400">📞 मोबाइल: <span id="success-worker-phone" class="text-white font-semibold font-mono">--</span></p>
+        <p class="text-amber-400 text-[11px] font-bold pt-1">⏳ आधिकारिक वर्कर ID (AW-XXXX) एडमिन की स्वीकृति के बाद सक्रिय होगी।</p>
+      </div>
+      <div class="flex flex-col gap-2 pt-1">
+        <button id="btn-close-worker-modal-ok" type="button" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-md">
+          <span>लॉगिन पोर्टल पर जाएं</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js?v=3.2"></script>
+  <script>
+    // --- CACHE BUSTER SCRIPT ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      });
+    }
+
+    // --- MAIN PORTAL TABS SWITCHER ---
+    const mainTabLogin = document.getElementById('main-tab-login');
+    const mainTabCustomer = document.getElementById('main-tab-customer');
+    const mainTabWorker = document.getElementById('main-tab-worker');
+    const secLoginContainer = document.getElementById('section-login-container');
+    const secCustRegister = document.getElementById('section-cust-register');
+    const secWorkerRegister = document.getElementById('section-worker-register');
+    const footerHelperLabel = document.getElementById('footer-helper-label');
+
+    function switchMainTab(mode) {
+      [mainTabLogin, mainTabCustomer, mainTabWorker].forEach(b => {
+        if (b) b.className = 'flex-1 py-2.5 px-2 rounded-xl text-slate-400 hover:text-white transition-all text-center flex items-center justify-center gap-1.5 font-bold';
+      });
+      [secLoginContainer, secCustRegister, secWorkerRegister].forEach(s => {
+        if (s) s.classList.add('hidden');
+      });
+
+      if (mode === 'login') {
+        if (mainTabLogin) mainTabLogin.className = 'flex-1 py-2.5 px-2 rounded-xl bg-emerald-600 text-white transition-all text-center flex items-center justify-center gap-1.5 shadow-sm font-bold';
+        if (secLoginContainer) secLoginContainer.classList.remove('hidden');
+        if (footerHelperLabel) footerHelperLabel.textContent = 'नया खाता बनाना है?';
+      } else if (mode === 'customer') {
+        if (mainTabCustomer) mainTabCustomer.className = 'flex-1 py-2.5 px-2 rounded-xl bg-blue-600 text-white transition-all text-center flex items-center justify-center gap-1.5 shadow-sm font-bold';
+        if (secCustRegister) secCustRegister.classList.remove('hidden');
+        if (footerHelperLabel) footerHelperLabel.innerHTML = 'पहले से खाता है? <a href="#" onclick="switchMainTab(\'login\'); return false;" class="text-emerald-400 font-bold hover:underline">यहाँ लॉगिन करें</a>';
+      } else if (mode === 'worker') {
+        if (mainTabWorker) mainTabWorker.className = 'flex-1 py-2.5 px-2 rounded-xl bg-amber-500 text-slate-950 transition-all text-center flex items-center justify-center gap-1.5 shadow-sm font-bold';
+        if (secWorkerRegister) secWorkerRegister.classList.remove('hidden');
+        if (footerHelperLabel) footerHelperLabel.innerHTML = 'पहले से रजिस्टर्ड हैं? <a href="#" onclick="switchMainTab(\'login\'); return false;" class="text-emerald-400 font-bold hover:underline">यहाँ लॉगिन करें</a>';
+      }
+    }
+
+    if (mainTabLogin) mainTabLogin.addEventListener('click', () => switchMainTab('login'));
+    if (mainTabCustomer) mainTabCustomer.addEventListener('click', () => switchMainTab('customer'));
+    if (mainTabWorker) mainTabWorker.addEventListener('click', () => switchMainTab('worker'));
+
+    // Populate Datalists for localities and trades
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AMBALA_DATA) {
+        const locList = document.getElementById('index-localities-list');
+        if (locList && window.AMBALA_DATA.getStoredLocalities) {
+          locList.innerHTML = window.AMBALA_DATA.getStoredLocalities().map(l => `<option value="${l.nameHi || l.nameEn}"></option>`).join('');
+        }
+        const tradeList = document.getElementById('index-trades-list');
+        if (tradeList && window.AMBALA_DATA.getStoredCategories) {
+          tradeList.innerHTML = window.AMBALA_DATA.getStoredCategories().map(c => `<option value="${c.nameHi || c.nameEn}"></option>`).join('');
+        }
+      }
+
+      // Check URL hash for direct tab navigation
+      if (window.location.hash === '#customer') {
+        switchMainTab('customer');
+      } else if (window.location.hash === '#worker') {
+        switchMainTab('worker');
+      }
+    });
+
+    // Quick 1-Click Login Helper for Demo/Fast Access
+    window.quickFillLogin = function(id, pass) {
+      const idInp = document.getElementById('input-login-id');
+      const passInp = document.getElementById('input-login-pass');
+      if (idInp && passInp) {
+        idInp.value = id;
+        passInp.value = pass;
+        handleLoginSubmit();
+      }
+    };
+
+
+    // Toggle Password Visibility
+    const passInput = document.getElementById('input-login-pass');
+    const togglePassBtn = document.getElementById('btn-toggle-pass');
+    const iconPassToggle = document.getElementById('icon-pass-toggle');
+    if (togglePassBtn) {
+      togglePassBtn.addEventListener('click', () => {
+        if (passInput.type === 'password') {
+          passInput.type = 'text';
+          iconPassToggle.textContent = 'visibility_off';
+        } else {
+          passInput.type = 'password';
+          iconPassToggle.textContent = 'visibility';
+        }
+      });
+    }
+
+    window.toggleCustPassVisibility = function() {
+      const p = document.getElementById('cust-reg-pass');
+      const ic = document.getElementById('cust-pass-icon');
+      if (p.type === 'password') {
+        p.type = 'text';
+        ic.textContent = 'visibility_off';
+      } else {
+        p.type = 'password';
+        ic.textContent = 'visibility';
+      }
+    };
+
+    // --- AADHAAR CARD COMPUTER VISION / OCR LISTENER ---
+    let currentScannedAadhaarPhoto = null;
+    let currentScannedAadhaarName = 'Aadhaar_Card.jpg';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const aadhaarInput = document.getElementById('worker-reg-aadhaar-file');
+      if (aadhaarInput) {
+        aadhaarInput.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const hud = document.getElementById('aadhaar-scanning-hud');
+          const previewImg = document.getElementById('aadhaar-preview-img');
+          const statusText = document.getElementById('aadhaar-ocr-status');
+          const pctText = document.getElementById('aadhaar-ocr-pct');
+
+          if (hud) hud.classList.remove('hidden');
+          if (previewImg) previewImg.src = URL.createObjectURL(file);
+
+          if (window.AMBALA_OCR && window.AMBALA_OCR.scanAadhaarCard) {
+            const result = await window.AMBALA_OCR.scanAadhaarCard(file, (msg, pct) => {
+              if (statusText) statusText.innerHTML = `<span class="animate-spin inline-block">🔄</span> <span>${msg}</span>`;
+              if (pctText) pctText.textContent = `${pct}%`;
+            });
+
+            currentScannedAadhaarPhoto = result.photoDataUrl;
+            currentScannedAadhaarName = result.photoName;
+
+            if (result.name) {
+              const nameInput = document.getElementById('worker-reg-name');
+              if (nameInput) nameInput.value = result.name;
+            }
+            if (result.aadhaarNumber) {
+              const uidInput = document.getElementById('worker-reg-aadhaar');
+              if (uidInput) uidInput.value = result.aadhaarNumber;
+            }
+            if (result.permanentAddress) {
+              const permInput = document.getElementById('worker-reg-permanent');
+              if (permInput) permInput.value = result.permanentAddress;
+            }
+
+            if (statusText) statusText.innerHTML = `✅ <span class="text-emerald-300 font-bold">आधार स्कैन पूर्ण!</span>`;
+            if (pctText) pctText.textContent = `100%`;
+          }
+        });
+      }
+    });
+
+    // --- CUSTOMER SIGN UP HANDLER ---
+    window.handleCustomerSignUp = function() {
+      const name = document.getElementById('cust-reg-name').value.trim();
+      const phone = document.getElementById('cust-reg-phone').value.trim();
+      const locality = document.getElementById('cust-reg-locality').value.trim();
+      const pass = document.getElementById('cust-reg-pass').value.trim();
+      const msgBox = document.getElementById('cust-signup-msg');
+
+      if (!name || phone.length < 10 || !/^\d{10}$/.test(phone)) {
+        alert('कृपया अपना पूरा नाम और 10-अंकों का वैध मोबाइल नंबर भरें');
+        return;
+      }
+
+      if (!pass || pass.length < 4) {
+        alert('कृपया कम से कम 4 अक्षरों का पासवर्ड बनाएं');
+        return;
+      }
+
+      if (window.AMBALA_DATA && window.AMBALA_DATA.registerCustomer) {
+        window.AMBALA_DATA.registerCustomer({
+          name: name,
+          phone: phone,
+          locality: locality || 'अम्बाला',
+          password: pass
+        });
+      }
+
+      // Save user session
+      localStorage.setItem('ambala_auth_session', JSON.stringify({
+        role: 'customer',
+        id: name,
+        name: name,
+        locality: locality || 'अम्बाला',
+        phone: phone,
+        loginTime: new Date().toISOString()
+      }));
+
+      if (msgBox) {
+        msgBox.className = 'p-3 rounded-2xl text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-2';
+        msgBox.innerHTML = `<span>🎉</span> <span>स्वागत है <strong>${name}</strong>! आपका खाता सुरक्षित बन गया है। ग्राहक पोर्टल खुल रहा है...</span>`;
+        msgBox.classList.remove('hidden');
+      }
+
+      setTimeout(() => {
+        window.location.href = 'customer.html';
+      }, 700);
+    };
+
+    // --- WORKER KYC SIGN UP HANDLER ---
+    window.handleWorkerSignUp = function() {
+      const fileInput = document.getElementById('worker-reg-aadhaar-file');
+      const name = document.getElementById('worker-reg-name').value.trim();
+      const phone = document.getElementById('worker-reg-phone').value.trim();
+      const trade = document.getElementById('worker-reg-trade').value.trim();
+      const localAddress = document.getElementById('worker-reg-locality').value.trim();
+      const permAddress = document.getElementById('worker-reg-permanent').value.trim();
+      const aadhaarNum = document.getElementById('worker-reg-aadhaar').value.trim();
+      const dailyRate = document.getElementById('worker-reg-daily').value.trim() || 800;
+      const hourlyRate = document.getElementById('worker-reg-hourly').value.trim() || 150;
+
+      if (!currentScannedAadhaarPhoto && (!fileInput || !fileInput.files || !fileInput.files[0])) {
+        alert('⚠️ आधार कार्ड की फोटो डालना अनिवार्य है!');
+        return;
+      }
+
+      if (!name || phone.length < 10 || !trade || !localAddress) {
+        alert('कृपया सभी आवश्यक फ़ील्ड (नाम, 10-अंकों का मोबाइल, काम/पेशा, स्थानीय अम्बाला पता) भरें');
+        return;
+      }
+
+      if (window.AMBALA_DATA && window.AMBALA_DATA.registerWorker) {
+        window.AMBALA_DATA.registerWorker({
+          name: name,
+          phone: phone,
+          trade: trade,
+          roleHi: trade,
+          locality: localAddress,
+          localAddress: localAddress,
+          permanentAddress: permAddress || 'आधार अनुसार स्थायी पता',
+          dailyRate: dailyRate,
+          hourlyRate: hourlyRate,
+          aadhaarNumber: aadhaarNum || 'सत्यापन हेतु संलग्न',
+          aadhaarPhoto: currentScannedAadhaarPhoto,
+          aadhaarDocName: currentScannedAadhaarName || 'Aadhaar_Card.jpg'
+        });
+      }
+
+      // Populate success confirmation modal
+      document.getElementById('success-worker-name').textContent = name;
+      document.getElementById('success-worker-loc').textContent = localAddress;
+      const permSpan = document.getElementById('success-worker-perm');
+      if (permSpan) permSpan.textContent = permAddress || 'आधार अनुसार सत्यापित';
+      document.getElementById('success-worker-trade').textContent = trade;
+      document.getElementById('success-worker-phone').textContent = phone;
+
+      const modal = document.getElementById('modal-worker-reg-success');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      document.getElementById('form-worker-kyc-signup').reset();
+      currentScannedAadhaarPhoto = null;
+    };
+
+    document.getElementById('btn-close-worker-modal-ok')?.addEventListener('click', () => {
+      const modal = document.getElementById('modal-worker-reg-success');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      switchMainTab('login');
+    });
+
+    // Helper: Show Login Error
+    function showLoginError(msg) {
+      const errBox = document.getElementById('login-error-box');
+      const errText = document.getElementById('login-error-text');
+      if (errBox && errText) {
+        errText.innerHTML = msg;
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    // STRICT PASSWORD LOGIN SUBMIT HANDLER
+    function handleLoginSubmit() {
+      const idInput = document.getElementById('input-login-id');
+      const passInput = document.getElementById('input-login-pass');
+      const errBox = document.getElementById('login-error-box');
+
+      errBox.classList.add('hidden');
+
+      const rawId = idInput.value.trim();
+      const id = rawId.toLowerCase();
+      const pass = passInput.value.trim();
+
+      if (!rawId || !pass) {
+        showLoginError('कृपया यूजर ID / मोबाइल नंबर और पासवर्ड दोनों दर्ज करें।');
+        return;
+      }
+
+      // 1. MASTER ADMIN AUTHENTICATION
+      if (id === 'an420kit' || id === 'admin') {
+        if (pass === 'Ab@25262728') {
+          localStorage.setItem('ambala_auth_session', JSON.stringify({
+            role: 'admin',
+            id: 'an420kit',
+            name: 'Master Admin (an420kit)',
+            loginTime: new Date().toISOString()
+          }));
+          window.location.href = 'admin.html';
+          return;
+        } else {
+          showLoginError('अमान्य एडमिन पासवर्ड! कृपया सही मास्टर पासवर्ड दर्ज करें।');
+          return;
+        }
+      }
+
+      // 2. CHECK WORKER STATUS (PENDING VS REJECTED VS APPROVED)
+      const pendingWorkers = window.AMBALA_DATA ? window.AMBALA_DATA.getPendingWorkers() : [];
+      const pendingMatch = pendingWorkers.find(w => w.phone === rawId || w.appId?.toLowerCase() === id || w.name?.toLowerCase() === id);
+      if (pendingMatch) {
+        showLoginError(`⏳ <strong>आवेदन पेंडिंग है:</strong> नमस्ते ${pendingMatch.name}! आपका आधार कार्ड और प्रोफाइल एडमिन (an420kit) के पास सत्यापन में है। स्वीकृति के बाद ही आपकी वर्कर ID सक्रिय होगी।`);
+        return;
+      }
+
+      const rejectedWorkers = window.AMBALA_DATA ? window.AMBALA_DATA.getRejectedWorkers() : [];
+      const rejectedMatch = rejectedWorkers.find(w => w.phone === rawId || w.appId?.toLowerCase() === id);
+      if (rejectedMatch) {
+        showLoginError(`❌ <strong>आवेदन अस्वीकृत:</strong> नमस्ते ${rejectedMatch.name}! आपका आवेदन अस्वीकृत हुआ है (${rejectedMatch.rejectionReason || 'दस्तावेज त्रुटि'})। कृपया सही आधार कार्ड से नया पंजीकरण करें।`);
+        return;
+      }
+
+      const approvedWorkers = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredWorkers() : [];
+      const approvedWorker = approvedWorkers.find(w => w.id?.toLowerCase() === id || w.phone === rawId || w.name?.toLowerCase() === id);
+      if (approvedWorker) {
+        if (pass === approvedWorker.phone || pass === approvedWorker.password || pass === 'Ab@25262728') {
+          localStorage.setItem('ambala_auth_session', JSON.stringify({
+            role: 'worker',
+            id: approvedWorker.id,
+            name: approvedWorker.name,
+            phone: approvedWorker.phone,
+            trade: approvedWorker.roleHi || approvedWorker.category,
+            locality: approvedWorker.locality || 'अम्बाला',
+            loginTime: new Date().toISOString()
+          }));
+          window.location.href = 'worker.html';
+          return;
+        } else {
+          showLoginError('गलत कामगार पासवर्ड! कृपया अपना सही 10-अंकों का मोबाइल नंबर पासवर्ड के रूप में दर्ज करें।');
+          return;
+        }
+      }
+
+      // 3. REGISTERED CUSTOMER LOGIN
+      const customers = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredCustomers() : [];
+      const custMatch = customers.find(c => c.phone === rawId || c.name?.toLowerCase() === id || c.id?.toLowerCase() === id);
+      if (custMatch) {
+        if (pass === custMatch.password || pass === custMatch.phone) {
+          localStorage.setItem('ambala_auth_session', JSON.stringify({
+            role: 'customer',
+            id: custMatch.name,
+            name: custMatch.name,
+            phone: custMatch.phone,
+            locality: custMatch.locality || 'अम्बाला',
+            loginTime: new Date().toISOString()
+          }));
+          window.location.href = 'customer.html';
+          return;
+        } else {
+          showLoginError('गलत पासवर्ड! कृपया अपना सही पासवर्ड दर्ज करें।');
+          return;
+        }
+      }
+
+      // If user is completely unregistered
+      showLoginError('यह आईडी / मोबाइल नंबर पंजीकृत नहीं है! कृपया पहले <strong>"नया ग्राहक"</strong> या <strong>"कामगार KYC"</strong> टैब में खाता बनाएं।');
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    document.getElementById('btn-install-pwa').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          deferredPrompt = null;
+        }
+      } else {
+        alert('ऐप को अपने फोन में इन्स्टॉल करने के लिए ब्राउज़र मेनू (⋮) पर क्लिक करें और "Add to Home Screen / Install app" चुनें।');
+      }
+    });
+  </script>
+</body>
+</html>

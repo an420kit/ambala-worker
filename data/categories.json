@@ -1,0 +1,21 @@
+[
+  { "id": "all", "nameEn": "All Services", "nameHi": "सभी काम", "icon": "🛠️" },
+  { "id": "bai", "nameEn": "Kaam Wali Bai (Maid)", "nameHi": "काम वाली बाई", "icon": "🧹" },
+  { "id": "plumber", "nameEn": "Plumber (Nal Mistri)", "nameHi": "प्लंबर (नल मिस्त्री)", "icon": "🔧" },
+  { "id": "electrician", "nameEn": "Electrician", "nameHi": "बिजली मिस्त्री", "icon": "⚡" },
+  { "id": "mistri", "nameEn": "Raj Mistri (Mason)", "nameHi": "राज मिस्त्री", "icon": "🧱" },
+  { "id": "dihadi", "nameEn": "Dihadi Mazdoor (Labour)", "nameHi": "दिहाड़ी मजदूर", "icon": "👷‍♂️" },
+  { "id": "maalish", "nameEn": "Maalish Wali (Care)", "nameHi": "मालिश वाली", "icon": "💆‍♀️" },
+  { "id": "painter", "nameEn": "Painter (Wall Putty)", "nameHi": "पेंटर मिस्त्री", "icon": "🎨" },
+  { "id": "cook", "nameEn": "Cook / Khansama", "nameHi": "रसोइया / कुक", "icon": "👨‍🍳" },
+  { "id": "carpenter", "nameEn": "Carpenter (Badhai)", "nameHi": "बढ़ई (लकड़ी काम)", "icon": "🪚" },
+  { "id": "loading", "nameEn": "Loading / Shifting", "nameHi": "लोडिंग / शिफ्टिंग", "icon": "📦" },
+  { "id": "welder", "nameEn": "Welder & Fabrication", "nameHi": "वेल्डर (गेट, ग्रिल)", "icon": "🔥" },
+  { "id": "ac_repair", "nameEn": "AC & Refrigerator Repair", "nameHi": "AC व फ्रिज मैकेनिक", "icon": "❄️" },
+  { "id": "driver", "nameEn": "Driver (Car / Commercial)", "nameHi": "गाड़ी ड्राइवर", "icon": "🚗" },
+  { "id": "guard", "nameEn": "Security Guard / Chowkidar", "nameHi": "सुरक्षा गार्ड / चौकीदार", "icon": "🛡️" },
+  { "id": "babysitter", "nameEn": "Babysitter / Daai", "nameHi": "बेबीसिटर / दाई", "icon": "👶" },
+  { "id": "gardener", "nameEn": "Gardener (Maali)", "nameHi": "माली (बगीचा काम)", "icon": "🌱" },
+  { "id": "tailor", "nameEn": "Tailor / Boutique Stitching", "nameHi": "टेलर / सिलाई कारीगर", "icon": "🪡" },
+  { "id": "mechanic", "nameEn": "Two-Wheeler & Auto Mechanic", "nameHi": "ऑटो व बाइक मैकेनिक", "icon": "🛵" }
+]

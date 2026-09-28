@@ -1,0 +1,29 @@
+{
+    "navigationColor":  "#0f172a",
+    "iconUrl":  "https://an420kit.github.io/ambala-worker/assets/icon-512.png",
+    "themeColor":  "#00236f",
+    "appVersion":  "1.0.0.0",
+    "orientation":  "portrait",
+    "startUrl":  "/ambala-worker/index.html",
+    "display":  "standalone",
+    "signing":  {
+                    "storePassword":  "password123",
+                    "alias":  "my-key-alias",
+                    "fullName":  "Ambala Worker",
+                    "organization":  "Ambala Worker Network",
+                    "file":  null,
+                    "countryCode":  "IN",
+                    "keyPassword":  "password123",
+                    "organizationalUnit":  "App Dept"
+                },
+    "splashColor":  "#00236f",
+    "backgroundColor":  "#0f172a",
+    "packageId":  "com.ambala.worker",
+    "host":  "https://an420kit.github.io/ambala-worker/",
+    "launcherName":  "à¤…à¤®à¥à¤¬à¤¾à¤²à¤¾ à¤µà¤°à¥à¤•à¤°",
+    "name":  "Ambala Worker",
+    "enableNotifications":  false,
+    "appVersionCode":  1,
+    "signingMode":  "new",
+    "maskableIconUrl":  "https://an420kit.github.io/ambala-worker/assets/icon-512.png"
+}

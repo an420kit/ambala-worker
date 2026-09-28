@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="ambalaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="44" fill="url(#ambalaGrad)"/>
+  <!-- Safety helmet / gear symbol and handshake or wrench -->
+  <circle cx="100" cy="72" r="32" fill="url(#accentGrad)"/>
+  <path d="M68 76 C68 54 82 40 100 40 C118 40 132 54 132 76 Z" fill="#FBBF24"/>
+  <rect x="62" y="74" width="76" height="10" rx="5" fill="#D97706"/>
+  <!-- Worker tool cross / shield -->
+  <path d="M60 120 C60 102 76 96 100 96 C124 96 140 102 140 120 L140 148 C140 156 132 162 124 162 L76 162 C68 162 60 156 60 148 Z" fill="#FFFFFF" opacity="0.95"/>
+  <!-- Checkmark verification badge -->
+  <circle cx="136" cy="134" r="16" fill="#10B981"/>
+  <path d="M129 134 L134 139 L144 129" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Wrench accent on chest -->
+  <path d="M92 118 L108 134 M108 118 L92 134" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

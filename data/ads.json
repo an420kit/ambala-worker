@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ad-upper-01",
+    "titleHi": "दीपावली व शादी सीजन: मकान पुट्टी-पेंट मेला",
+    "subtitleHi": "Asian Paints अधिकृत पेंटर उपलब्ध • 15% छूट व फ्री कोटेशन",
+    "phone": "9812345000",
+    "badge": "ऑफर",
+    "bannerType": "upper",
+    "mediaType": "image",
+    "mediaUrl": "assets/hero_banner.jpg",
+    "clipDuration": 10,
+    "audioEnabled": true,
+    "target": "both",
+    "isActive": true,
+    "createdAt": "2026-09-28T10:00:00.000Z"
+  },
+  {
+    "id": "ad-side-01",
+    "titleHi": "⚡ 24x7 इमरजेंसी बिजली व मोटर रिपेयर",
+    "subtitleHi": "15 मिनट में मिस्त्री आपके घर • अम्बाला कैंट व सिटी",
+    "phone": "9812345004",
+    "badge": "इमरजेंसी",
+    "bannerType": "side",
+    "mediaType": "video",
+    "mediaUrl": "assets/worker_rajesh.jpg",
+    "clipDuration": 10,
+    "audioEnabled": true,
+    "target": "both",
+    "isActive": true,
+    "createdAt": "2026-09-28T10:30:00.000Z"
+  }
+]

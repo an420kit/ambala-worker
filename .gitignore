@@ -1,0 +1,13 @@
+# Ambala Worker - .gitignore
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.tempmediaStorage/
+.system_generated/
+scratch/
+android/.gradle/
+android/build/
+android/app/build/
+*.lock
+

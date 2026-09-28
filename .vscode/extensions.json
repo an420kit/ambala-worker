@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "snyk-security.snyk-vulnerability-scanner",
+    "sonarsource.sonarlint-vscode",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ]
+}
