@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hi" class="h-full">
 <head>
   <meta charset="utf-8"/>
@@ -490,172 +490,17 @@
     }
 
     // --- SETUP AUTOCOMPLETE & EVENTS ---
-        // --- DYNAMIC WORKER UPPER & SIDE BANNERS ENGINE ---
-    window.toggleVideoAudio = function(videoElId, btn) {
-      const vid = document.getElementById(videoElId);
-      if (!vid) return;
-      if (vid.muted) {
-        vid.muted = false;
-        vid.volume = 1.0;
-        vid.play().catch(() => {});
-        btn.querySelector('.icon').textContent = 'ðŸ”Š';
-        btn.querySelector('.lbl').textContent = 'à¤†à¤µà¤¾à¤œà¤¼ à¤¬à¤‚à¤¦';
-        btn.classList.add('bg-emerald-600', 'text-white');
-        btn.classList.remove('bg-black/80', 'text-amber-400');
-        showWorkerToast('ðŸ”Š 10-à¤¸à¥‡à¤•à¤‚à¤¡ à¤‘à¤¡à¤¿à¤¯à¥‹ à¤•à¥à¤²à¤¿à¤ª à¤šà¤¾à¤²à¥‚ à¤¹à¥ˆ!');
-      } else {
-        vid.muted = true;
-        btn.querySelector('.icon').textContent = 'ðŸ”‡';
-        btn.querySelector('.lbl').textContent = '10s à¤‘à¤¡à¤¿à¤¯à¥‹ à¤šà¤¾à¤²à¥‚';
-        btn.classList.remove('bg-emerald-600', 'text-white');
-        btn.classList.add('bg-black/80', 'text-amber-400');
-      }
-    };
-
-    window.toggleSideBannerDrawer = function() {
-      const drawer = document.getElementById('worker-side-banner-drawer');
-      const badge = document.getElementById('worker-side-banner-badge');
-      if (!drawer) return;
-      if (drawer.classList.contains('hidden')) {
-        drawer.classList.remove('hidden');
-        if (badge) badge.classList.add('hidden');
-      } else {
-        drawer.classList.add('hidden');
-        if (badge) badge.classList.remove('hidden');
-      }
-    };
-
+    // --- DYNAMIC WORKER UPPER & SIDE BANNERS ENGINE ---
+    // Uses js/banner-renderer.js for zero-mojibake high performance rendering
     function renderWorkerBanners() {
-      const upperContainer = document.getElementById('worker-upper-banner-container');
-      const sideContainer = document.getElementById('worker-side-banner-container');
-      const ads = window.AMBALA_DATA ? window.AMBALA_DATA.getStoredAds() : [];
-      const activeAds = ads.filter(a => a.isActive && (a.target === 'both' || a.target === 'worker'));
-
-      // 1. Upper Banner
-      if (upperContainer) {
-        const upperAd = activeAds.find(a => a.bannerType === 'upper' || a.bannerType === 'both') || activeAds[0];
-        if (upperAd) {
-          if (upperAd.mediaType === 'video') {
-            upperContainer.innerHTML = `
-              <div class="relative bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-3.5 text-white shadow-lg border border-indigo-500/30 overflow-hidden">
-                <div class="flex flex-col sm:flex-row items-center gap-3.5">
-                  <div class="relative w-full sm:w-48 h-36 rounded-2xl overflow-hidden bg-black shrink-0 border border-slate-700">
-                    <video id="wrk-upper-vid" src="${upperAd.mediaUrl}" loop playsinline autoplay muted class="w-full h-full object-cover"></video>
-                    <button type="button" onclick="toggleVideoAudio('wrk-upper-vid', this)" class="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-black/80 hover:bg-black text-[10px] font-bold text-amber-400 flex items-center gap-1 shadow-md transition-all">
-                      <span class="icon">ðŸ”‡</span>
-                      <span class="lbl">10s à¤‘à¤¡à¤¿à¤¯à¥‹ à¤šà¤¾à¤²à¥‚</span>
-                    </button>
-                    <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-rose-600 text-white font-black text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-sm">
-                      <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                      <span>10s à¤•à¥à¤²à¤¿à¤ª</span>
-                    </div>
-                  </div>
-                  <div class="flex-1 min-w-0 flex flex-col justify-between py-1">
-                    <div>
-                      <div class="flex items-center gap-1.5 mb-1">
-                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black">${upperAd.badge || 'à¤‘à¤«à¤°'}</span>
-                        <span class="text-[10px] text-emerald-400 font-bold">ðŸ” à¤®à¥à¤–à¥à¤¯ à¤¸à¥à¤ªà¥‰à¤¨à¥à¤¸à¤°</span>
-                      </div>
-                      <h3 class="text-sm sm:text-base font-extrabold text-white leading-tight">${upperAd.titleHi}</h3>
-                      <p class="text-xs text-slate-300 mt-1 line-clamp-2">${upperAd.subtitleHi}</p>
-                    </div>
-                    <div class="flex items-center gap-2 mt-3">
-                      <a href="tel:${upperAd.phone}" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black shadow-sm flex items-center gap-1 active:scale-95 transition-all">
-                        <span>ðŸ“ž à¤¤à¥à¤°à¤‚à¤¤ à¤•à¥‰à¤² à¤•à¤°à¥‡à¤‚</span>
-                      </a>
-                      <a href="https://wa.me/91${upperAd.phone}" target="_blank" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-bold flex items-center gap-1 active:scale-95 transition-all">
-                        <span>ðŸ’¬ à¤µà¥à¤¹à¤¾à¤Ÿà¥à¤¸à¤à¤ª</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `;
-          } else {
-            upperContainer.innerHTML = `
-              <div class="relative bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-3.5 text-white shadow-lg border border-indigo-500/30 overflow-hidden flex flex-col sm:flex-row items-center gap-3.5">
-                <img src="${upperAd.mediaUrl || 'assets/hero_banner.jpg'}" class="w-full sm:w-48 h-36 rounded-2xl object-cover border border-slate-700 shrink-0" alt="Ad Banner"/>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-1.5 mb-1">
-                    <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black">${upperAd.badge || 'à¤‘à¤«à¤°'}</span>
-                    <span class="text-[10px] text-emerald-400 font-bold">ðŸ” à¤®à¥à¤–à¥à¤¯ à¤¸à¥à¤ªà¥‰à¤¨à¥à¤¸à¤°</span>
-                  </div>
-                  <h3 class="text-sm sm:text-base font-extrabold text-white">${upperAd.titleHi}</h3>
-                  <p class="text-xs text-slate-300 mt-1">${upperAd.subtitleHi}</p>
-                  <div class="flex items-center gap-2 mt-3">
-                    <a href="tel:${upperAd.phone}" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black shadow-sm flex items-center gap-1 active:scale-95 transition-all">
-                      <span>ðŸ“ž à¤¤à¥à¤°à¤‚à¤¤ à¤•à¥‰à¤² à¤•à¤°à¥‡à¤‚</span>
-                    </a>
-                    <a href="https://wa.me/91${upperAd.phone}" target="_blank" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-bold flex items-center gap-1 active:scale-95 transition-all">
-                      <span>ðŸ’¬ à¤µà¥à¤¹à¤¾à¤Ÿà¥à¤¸à¤à¤ª</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            `;
-          }
-        } else {
-          upperContainer.innerHTML = '';
-        }
-      }
-
-      // 2. Side Floating Banner
-      if (sideContainer) {
-        const sideAd = activeAds.find(a => a.bannerType === 'side' || a.bannerType === 'both');
-        if (sideAd) {
-          sideContainer.innerHTML = `
-            <!-- Floating Side Badge Button -->
-            <button id="worker-side-banner-badge" type="button" onclick="toggleSideBannerDrawer()" class="fixed top-1/3 right-0 z-40 bg-gradient-to-l from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-[11px] py-2.5 px-3 rounded-l-2xl shadow-2xl flex items-center gap-1.5 active:scale-95 transition-all border-y border-l border-amber-300/40">
-              <span class="animate-bounce">ðŸ“¢</span>
-              <span>à¤‘à¤«à¤°</span>
-              ${sideAd.mediaType === 'video' ? '<span class="text-[9px] px-1 py-0.5 rounded bg-slate-950 text-amber-300 font-bold">10s à¤‘à¤¡à¤¿à¤¯à¥‹</span>' : ''}
-            </button>
-
-            <!-- Expandable Side Banner Drawer -->
-            <div id="worker-side-banner-drawer" class="hidden fixed bottom-20 right-4 z-50 w-72 bg-slate-900/95 backdrop-blur-xl border-2 border-amber-400 rounded-3xl p-3.5 text-white shadow-2xl transition-all">
-              <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-sm">âš¡</span>
-                  <span class="text-xs font-black text-amber-400">à¤µà¤¿à¤¶à¥‡à¤· à¤¸à¤¾à¤‡à¤¡ à¤¸à¥à¤ªà¥‰à¤¨à¥à¤¸à¤°</span>
-                </div>
-                <button type="button" onclick="toggleSideBannerDrawer()" class="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs">âœ•</button>
-              </div>
-
-              <div class="mt-2.5 flex flex-col gap-2">
-                ${sideAd.mediaType === 'video' ? `
-                  <div class="relative w-full h-36 rounded-2xl overflow-hidden bg-black border border-slate-700">
-                    <video id="wrk-side-vid" src="${sideAd.mediaUrl}" loop playsinline autoplay muted class="w-full h-full object-cover"></video>
-                    <button type="button" onclick="toggleVideoAudio('wrk-side-vid', this)" class="absolute bottom-1.5 right-1.5 px-2 py-1 rounded-lg bg-black/80 text-[10px] font-bold text-amber-400 flex items-center gap-1">
-                      <span class="icon">ðŸ”‡</span>
-                      <span class="lbl">10s à¤†à¤µà¤¾à¤œà¤¼ à¤¸à¥à¤¨à¥‡à¤‚</span>
-                    </button>
-                  </div>
-                ` : `
-                  <img src="${sideAd.mediaUrl || 'assets/worker_rajesh.jpg'}" class="w-full h-32 rounded-2xl object-cover border border-slate-700" alt="Side Ad"/>
-                `}
-
-                <div>
-                  <h4 class="text-xs font-bold text-white leading-tight">${sideAd.titleHi}</h4>
-                  <p class="text-[11px] text-slate-300 mt-0.5">${sideAd.subtitleHi}</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 mt-1">
-                  <a href="tel:${sideAd.phone}" class="py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 text-center shadow-sm">
-                    <span>ðŸ“ž à¤•à¥‰à¤²</span>
-                  </a>
-                  <a href="https://wa.me/91${sideAd.phone}" target="_blank" class="py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold border border-emerald-500/30 rounded-xl text-xs flex items-center justify-center gap-1 text-center">
-                    <span>ðŸ’¬ à¤µà¥à¤¹à¤¾à¤Ÿà¥à¤¸à¤à¤ª</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          `;
-        } else {
-          sideContainer.innerHTML = '';
-        }
+      if (window.renderAmbalaBanners) {
+        window.renderAmbalaBanners({
+          portal: 'worker',
+          upperContainerId: 'worker-upper-banner-container',
+          sideContainerId: 'worker-side-banner-container'
+        });
       }
     }
-
     document.addEventListener('DOMContentLoaded', () => {
       renderWorkerBanners();
       renderJobs();
