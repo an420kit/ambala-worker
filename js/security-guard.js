@@ -170,33 +170,8 @@
     } catch (e) {}
   }
 
-  // 7. Anti-Debugging Watchdog
-  // Triggers debugger freeze only if DevTools is explicitly opened
-  let devtoolsOpen = false;
-  setInterval(function () {
-    const widthThreshold = window.outerWidth - window.innerWidth > 160;
-    const heightThreshold = window.outerHeight - window.innerHeight > 160;
-    
-    if (widthThreshold || heightThreshold) {
-      if (!devtoolsOpen) {
-        devtoolsOpen = true;
-        showSecurityWarning('⚠️ डेवलपर टूल्स सक्रिय हैं। सुरक्षा कारणों से सोर्स कोड सुरक्षित किया गया है।');
-      }
-      // Anti-debug trap loop if DevTools is active
-      try {
-        (function antiDebug(i) {
-          if (('' + i / i).length !== 1 || i % 20 === 0) {
-            (function () {}).constructor('debugger')();
-          } else {
-            (function () {}).constructor('debugger')();
-          }
-          antiDebug(++i);
-        })(0);
-      } catch (e) {}
-    } else {
-      devtoolsOpen = false;
-    }
-  }, 3000);
+  // 7. Silent Anti-Tamper Protection (No annoying intervals or false alarms)
+  // DevTools inspection shortcuts and context menu are strictly blocked above.
 
   // 8. Prevent Code Tampering on Global Data Namespace
   window.addEventListener('load', function () {

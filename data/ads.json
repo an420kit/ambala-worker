@@ -21,7 +21,7 @@
     "phone": "9812345004",
     "badge": "इमरजेंसी",
     "bannerType": "side",
-    "mediaType": "video",
+    "mediaType": "image",
     "mediaUrl": "assets/worker_rajesh.jpg",
     "clipDuration": 10,
     "audioEnabled": true,
